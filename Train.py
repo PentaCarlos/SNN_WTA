@@ -37,13 +37,13 @@ if __name__ == "__main__":
     
     # =========================== Parameters ==============================
     seed(0)
-    file_name = 'pairSTDP_40k'
+    file_name = 'pairSTDP_NN'
     Neurons_Mdl = 100
     processInp = True
     norm_mdl = True
 
-    train_dt = 40000
-    epoch = 1
+    train_dt = 1000
+    epoch = 5
     Run_train = True
 
     # ====================== Load MNIST Dataset ==========================

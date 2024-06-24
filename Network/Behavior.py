@@ -65,11 +65,40 @@ def LayerSpike(ESP, ISP):
     plt.ylabel('Neuron Index')
     plt.tight_layout()
 
+def Learn_Analysis(Net, idx:int=0):
+    W_diff = np.diff(Net['Syn1_Mon'].w.T[:,idx])
+    w_diff_non_zero = np.where(W_diff != 0)
+    dw = W_diff[w_diff_non_zero].tolist()
+
+    Post_spikes = Net['Exc_Sp'].spike_trains()[15]/second
+    Pre_spikes = Net['Input_Sp'].spike_trains()[300+idx]/second
+
+    time = Net['Syn1_Mon'].t/second
+    t_non_zero = time[w_diff_non_zero]
+    
+
+    fig, axs = plt.subplots(4, 1, sharex=True)
+    fig.set_size_inches(8, 12)
+    axs[0].eventplot(Post_spikes, linelengths=0.5, color='r')
+    axs[0].eventplot(Pre_spikes, linelengths=0.5, lineoffsets=1.5, color='g')
+    axs[0].set_yticks([1, 1.5], ['Post', 'Pre'])
+    axs[1].scatter(t_non_zero, dw, label='Weight Changes', color='b')
+    axs[1].set_ylabel(r'$\Delta W$')
+    axs[1].legend()
+    axs[1].grid()
+    axs[2].plot(time, Net['Syn1_Mon'].pre.T[:,0], color='g')
+    axs[2].set_ylabel(r'$Pre_{trace}$')
+    axs[2].grid()
+    axs[3].plot(time, Net['Syn1_Mon'].w.T[:,0], color='b')
+    axs[3].set_ylabel(r'$W(t)$')
+    axs[3].grid()
+    plt.tight_layout()
+        
 if __name__ == "__main__":
     
     # Random SEED
     seed(0)
-    Run_behavior = False
+    Run_behavior = True
 
     # ====================== Load MNIST Dataset ==========================
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -89,48 +118,11 @@ if __name__ == "__main__":
     else:
         Mdl.net.restore('Mdl_Behavior','Temp/Mdl_Behavior.b2')
     
-    # ==================== Plots of Network Behavior ======================
-    
-    def get_dW(idx):
-        #new_w = [round(val_w, 2) for val_w in Mdl.net['Syn1_Mon'].w.T[:,idx]]
-        W_diff = np.diff(Mdl.net['Syn1_Mon'].w.T[:,idx])
-        w_diff_non_zero = np.where(W_diff != 0)
-        dw = W_diff[w_diff_non_zero].tolist()
-
-        Post_spikes = Mdl.net['Exc_Sp'].spike_trains()[15]/second
-        Pre_spikes = Mdl.net['Input_Sp'].spike_trains()[300+idx]/second
-
-        # dt = []
-        # time = Mdl.net['Syn1_Mon'].t/second
-        # t_non_zero = time[w_diff_non_zero]
-        # for i, Sp_time in enumerate(t_non_zero):
-        #     t_post = []
-        # for i in range(0, len(dw)):
-        #     time_stamp = t_non_zero[i]
-        #     t_post = (Post_spikes[np.where(Post_spikes <= time_stamp)])[-1]
-        #     t_pre = (Pre_spikes[np.where(Pre_spikes <= time_stamp)])[-1]
-        #     dt.append(t_post - t_pre)
-        
-
-        plt.figure()
-        plt.eventplot(Post_spikes, linelengths=0.5, color='g')
-        plt.eventplot(Pre_spikes, linelengths=0.5, lineoffsets=1.5, color='r')
-        plt.yticks([1, 1.5], ['Post', 'Pre'])
-        
-        # plt.figure()
-        # plt.scatter(dt, dw, label='Weight Changes', color='b')
-        # plt.xlim(-0.2, 0.2)
-        # plt.legend()
-        # plt.grid()
-    
-    get_dW(idx=0)
-    
+    # ==================== Plots of Network Behavior ====================== 
+    Traces_S1(S1M=Mdl.net['Syn1_Mon'])
+    NeuronMem(ESM=Mdl.net['Exc_mem'], ISM=Mdl.net['Inh_mem'], neuron=13)
+    LayerRate(ERM=Mdl.net['Exc_rate'], IRM=Mdl.net['Inh_rate'])
+    LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
+    pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'])
+    Learn_Analysis(Net=Mdl.net, idx=0)
     plt.show()
-    #print(np.array(Mdl.net['Syn1_Mon'].post.T[:,0]).shape)
-
-    # Traces_S1(S1M=Mdl.net['Syn1_Mon'])
-    # NeuronMem(ESM=Mdl.net['Exc_mem'], ISM=Mdl.net['Inh_mem'], neuron=13)
-    # LayerRate(ERM=Mdl.net['Exc_rate'], IRM=Mdl.net['Inh_rate'])
-    # LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
-    # pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'])
-    # plt.show()

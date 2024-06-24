@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # =========================== Parameters ==============================
     
     Mdl_params = {
-        'Filename':'pairSTDP',
+        'Filename':'pairSTDP_NN',
         'Norm':True,
         'Neurons':100,
         'preInp':True,

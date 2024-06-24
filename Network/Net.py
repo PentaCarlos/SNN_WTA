@@ -78,7 +78,9 @@ class WTA:
                 for idx in range(4):
                     img_arr = np.array(X_single[idx]).reshape((14*14)) # Reshaped Reduced Gabor Filtered Img
                     if norm:
-                        img_norm = [x/5 for x in img_arr] # Reduce firing Input Rate
+                        norm_factor = 1000.
+                        Avr_Gb = np.sum(img_arr)
+                        img_norm = [(norm_factor*x)/Avr_Gb for x in img_arr]
                         Inp_data.extend(img_norm)
                     else:
                         Inp_data.extend(img_arr)
