@@ -1,7 +1,7 @@
 from brian2 import Synapses
 from brian2.units import *
 
-class Learning:
+class WTA_Connection:
 
     def __init__(self, Rule:str, Nearest_Neighbor:bool):
         self.Mode = Rule
@@ -25,10 +25,10 @@ class Learning:
                 self.pre_event = '''
                     ge += w
                     pre = 1.
-                    w = clip(w + On*pre_rate*post, -Gmax, Gmax)
+                    w = clip(w + On*pre_rate*post, 0, Gmax)
                 '''
                 self.post_event = '''
-                    w = clip(w + On*post_rate*pre, -Gmax, Gmax)
+                    w = clip(w + On*post_rate*pre, 0, Gmax)
                     post = -1.
                 '''
             else:
@@ -84,14 +84,8 @@ class Learning:
         Syn_STDP.w = 'rand()*Gmax'
         return Syn_STDP
     
-    def ConnDirect(self, preConn, postConn, pre_event, Syn_weight, tag_name):
-        Syn_direct = Synapses(source=preConn, target=postConn, model='w : 1', on_pre=pre_event, method='euler', name=tag_name)
-        Syn_direct.connect(j='i')
-        Syn_direct.w = Syn_weight
-        return Syn_direct
-    
-    def ConnIndirect(self, preConn, postConn, pre_event, Syn_weight, tag_name):
-        Syn_Indirect = Synapses(source=preConn, target=postConn, model='w : 1', on_pre=pre_event, method='euler', name=tag_name)
-        Syn_Indirect.connect(condition='j!=i')
-        Syn_Indirect.w = Syn_weight
-        return Syn_Indirect
+    def ConnStatic(self, preConn, postConn, pre_event, Cond, Syn_weight, tag_name):
+        Syn_Static = Synapses(source=preConn, target=postConn, model='w : 1', on_pre=pre_event, method='euler', name=tag_name)
+        Syn_Static.connect(condition=Cond)
+        Syn_Static.w = Syn_weight
+        return Syn_Static

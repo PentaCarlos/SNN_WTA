@@ -96,18 +96,27 @@ def Learn_Analysis(Net, idx:int=0):
         
 if __name__ == "__main__":
     
-    # Random SEED
-    seed(0)
-    Run_behavior = True
-
+    # ===================== Params Initialization =========================
+    init_params = {
+        'Random_Seed':0,
+        'Run_Behavior':True
+    }
+    Net_init = {
+        'Neurons':100,
+        'Learning_Rule':'pair_STDP',
+        'Nearest_Neighbor':True,
+        'Run_test':False,
+        'Monitors':True
+    }
     # ====================== Load MNIST Dataset ==========================
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
     X_train = X_train / 4.
     X_test = X_test / 4.
 
     # =========================== Model ===================================
-    Mdl = WTA(Monitors=True)
-    if Run_behavior:
+    seed(init_params['Random_Seed'])
+    Mdl = WTA(Net_setup=Net_init)
+    if init_params['Run_Behavior']:
         X_pre = Mdl.preProcess(X_data=X_train[:30], preInp=True)
         for idx in tqdm(range(len(X_pre)), desc='Loading'):
             Mdl.Norm_SynW(Norm_w=True)

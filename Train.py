@@ -36,15 +36,23 @@ def Clean_TempFolder(Flush:bool=False):
 if __name__ == "__main__":
     
     # =========================== Parameters ==============================
-    seed(0)
-    file_name = 'pairSTDP_NN'
-    Neurons_Mdl = 100
-    processInp = True
-    norm_mdl = True
+    init_params = {
+        'Random_Seed':0,
+        'Filename':'pairSTDP_NN',
+        'Gabor_filter':True,
+        'Norm':True,
+        'Train_dt':1000,
+        'Epoch':5,
+        'Run_train':True
+    }
 
-    train_dt = 1000
-    epoch = 5
-    Run_train = True
+    Net_init = {
+        'Neurons':100,
+        'Learning_Rule':'pair_STDP',
+        'Nearest_Neighbor':True,
+        'Run_test':False,
+        'Monitors':False
+    }
 
     # ====================== Load MNIST Dataset ==========================
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -52,26 +60,26 @@ if __name__ == "__main__":
     X_test = X_test / 4.
 
     # =========================== Model ===================================
-    Mdl = WTA(Monitors=False)
-    if Run_train:
-        Clean_TempFolder(Flush=False)
-        Mdl.net['Syn1'].On = 1
-        X_pre = Mdl.preProcess(X_data=X_train[:train_dt], preInp=processInp)
+    seed(init_params['Random_Seed'])
+    Mdl = WTA(Net_setup=Net_init)
+    if init_params['Run_train']:
+        Clean_TempFolder(Flush=True)
+        X_pre = Mdl.preProcess(X_data=X_train[:init_params['Train_dt']], preInp=init_params['Gabor_filter'])
 
         print("================== # TRAINING MODEL # ==================")
-        for ep in range(epoch):
+        for ep in range(init_params['Epoch']):
             for idx in tqdm(range(len(X_pre)), desc='Loading ' + str(ep + 1)):
                 Mdl.Norm_SynW(Norm_w=True)
 
-                Mdl.RunModel(X_single=X_pre[idx], preInp=processInp, norm=norm_mdl, phase='Stimulus')
+                Mdl.RunModel(X_single=X_pre[idx], preInp=init_params['Gabor_filter'], norm=init_params['Norm'], phase='Stimulus')
                 Mdl.RunModel(phase='Resting')
             temp_ep = 'Temp_Ep' + str(ep + 1)
             Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
-        Mdl.net.store(file_name,'Trained_Models/' + file_name + '.b2')
+        Mdl.net.store(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
     else:
-        Mdl.net.restore(file_name,'Trained_Models/' + file_name + '.b2')
+        Mdl.net.restore(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
     
 
     # ==================== Plots of Network Behavior ======================
-    Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
+    if Net_init['Neurons'] == 100: Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
     plt.show()
