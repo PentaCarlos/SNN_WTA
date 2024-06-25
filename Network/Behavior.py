@@ -117,6 +117,7 @@ if __name__ == "__main__":
     seed(init_params['Random_Seed'])
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_Behavior']:
+        Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_train[:30], preInp=True)
         for idx in tqdm(range(len(X_pre)), desc='Loading'):
             Mdl.Norm_SynW(Norm_w=True)

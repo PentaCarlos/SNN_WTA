@@ -70,6 +70,26 @@ class WTA:
             X_pre = X_data
         return X_pre
     
+    def Init_State(self):
+        Mem_Potential = {
+            'Exc':self.net['Exc'].v,
+            'Inh':self.net['Inh'].v
+        }
+        Syn_Conductance = {
+            'Exc_ge':self.net['Exc'].ge,
+            'Exc_gi':self.net['Exc'].gi,
+            'Inh_ge':self.net['Inh'].ge,
+            'Inh_gi':self.net['Inh'].gi
+        }
+        Stdp_traces = {
+            'Pre_trace':self.net['Syn1'].pre,
+            'Post_trace':self.net['Syn1'].post
+        }
+
+        self.init_Mem = Mem_Potential
+        self.init_Syn_Cond = Syn_Conductance
+        self.init_Stdp_traces = Stdp_traces
+
     def RunModel(self, X_single:ndarray=np.zeros(28*28), preInp:bool=False, norm:bool=False, phase:str='Resting'):
         if phase == 'Stimulus':
             if preInp:
@@ -94,8 +114,16 @@ class WTA:
         
         elif phase == 'Resting':
             # Resting Phase
-            self.net['Input'].rates = X_single*Hz
-            self.net.run(0.15*second)
+            # self.net['Input'].rates = X_single*Hz
+            # self.net.run(0.15*second)
+            self.net['Exc'].v = self.init_Mem['Exc']
+            self.net['Inh'].v = self.init_Mem['Inh']
+            self.net['Exc'].ge = self.init_Syn_Cond['Exc_ge']
+            self.net['Exc'].gi = self.init_Syn_Cond['Exc_gi']
+            self.net['Inh'].ge = self.init_Syn_Cond['Inh_ge']
+            self.net['Inh'].gi = self.init_Syn_Cond['Inh_gi']
+            self.net['Syn1'].pre = self.init_Stdp_traces['Pre_trace']
+            self.net['Syn1'].post = self.init_Stdp_traces['Post_trace']
         
         else:
             print('Phase not correctly declared!!')

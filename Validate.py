@@ -16,6 +16,7 @@ def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:
 
     if Run_trial:
         Mdl = WTA(Net_setup=Net_params)
+        Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_data, preInp=init_params['Gabor_filter'])
         Train_Sp, Input_Sp = [], []
         Mdl.net.restore(init_params['Filename'], filename='Trained_Models/' + init_params['Filename'] + '.b2')
@@ -86,13 +87,13 @@ if __name__ == "__main__":
     
     Validate_params = {
         'Random_Seed':0,
-        'Filename':'pairSTDP_NN',
+        'Filename':'pairSTDP_NN_Full',
         'Gabor_filter':True,
         'Norm':True,
-        'Train_dt':1000,
+        'Train_dt':60000,
         'Test_dt':10000,
-        'Run_train':False,
-        'Run_test':False
+        'Run_train':True,
+        'Run_test':True
     }
 
     Net_init = {
