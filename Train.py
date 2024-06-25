@@ -38,11 +38,11 @@ if __name__ == "__main__":
     # =========================== Parameters ==============================
     init_params = {
         'Random_Seed':0,
-        'Filename':'pairSTDP_NN',
+        'Filename':'pairSTDP_NN_Full',
         'Gabor_filter':True,
         'Norm':True,
-        'Train_dt':1000,
-        'Epoch':5,
+        'Train_dt':60000,
+        'Epoch':3,
         'Run_train':True
     }
 
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_train']:
         Clean_TempFolder(Flush=True)
+        Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_train[:init_params['Train_dt']], preInp=init_params['Gabor_filter'])
 
         print("================== # TRAINING MODEL # ==================")
