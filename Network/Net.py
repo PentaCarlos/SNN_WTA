@@ -1,5 +1,5 @@
 from Network.Neuron import Conductance_LIF
-from Network.Learn import Learning
+from Network.Learn import WTA_Connection
 from Network.Tools import GaborKernel, filterGb, norm_Weight
 from skimage.measure import block_reduce
 from tqdm import tqdm
@@ -10,18 +10,15 @@ import sys
 
 class WTA:
 
-    def __init__(self, Monitors:bool=False, Run_Test:bool=False):
+    def __init__(self, Net_setup:dict={'Neurons':100, 'Learning_Rule':'pair_STDP', 'Nearest_Neighbor':True, 'Run_test':False, 'Monitors':False}):
         Mdl = {}
         self.n_input = 28*28
-        self.n_layer = 100
-        
-        if Run_Test == True: self.Stdp_Switch = 0
-        else: self.Stdp_Switch = 1
+        self.n_layer = Net_setup['Neurons']
         
         # Initialize Predifined Class Models
         Neuron_Exc = Conductance_LIF(Neuron_type='Excitatory')
         Neuron_Inh = Conductance_LIF(Neuron_type='Inhibitory')
-        Learn_Rule = Learning(Rule='pair_STDP', Nearest_Neighbor=True)
+        SynConn = WTA_Connection(Rule=Net_setup['Learning_Rule'], Nearest_Neighbor=Net_setup['Nearest_Neighbor'])
         
         # Input images as rate encoded Poisson generators
         Mdl['Input'] = PoissonGroup(self.n_input, rates=np.zeros(self.n_input)*Hz, name='Input')
@@ -31,14 +28,16 @@ class WTA:
         Mdl['Inh'] = Neuron_Inh.GroupMode(Neurons=self.n_layer, tag_name='Inh')
 
         # Synapse 1 (Learning) [Input --> Exc]
-        Mdl['Syn1'] = Learn_Rule.ConnSTDP(preConn=Mdl['Input'], postConn=Mdl['Exc'], Stdp_state=self.Stdp_Switch, tag_name='Syn1')
+        if Net_setup['Run_test'] == True: self.Stdp_Switch = 0
+        else: self.Stdp_Switch = 1
+        Mdl['Syn1'] = SynConn.ConnSTDP(preConn=Mdl['Input'], postConn=Mdl['Exc'], Stdp_state=self.Stdp_Switch, tag_name='Syn1')
         # Synapse 2 (Static) [Exc --> Inh]
-        Mdl['Syn2'] = Learn_Rule.ConnDirect(preConn=Mdl['Exc'], postConn=Mdl['Inh'], pre_event='ge += w', Syn_weight=10.4, tag_name='Syn2')
+        Mdl['Syn2'] = SynConn.ConnStatic(preConn=Mdl['Exc'], postConn=Mdl['Inh'], pre_event='ge += w', Cond='j==i', Syn_weight=10.4, tag_name='Syn2')
         # Synapse 3 (Static) [Inh --> Exc]
-        Mdl['Syn3'] = Learn_Rule.ConnIndirect(preConn=Mdl['Inh'], postConn=Mdl['Exc'], pre_event='gi += w', Syn_weight=17, tag_name='Syn3')
+        Mdl['Syn3'] = SynConn.ConnStatic(preConn=Mdl['Inh'], postConn=Mdl['Exc'], pre_event='gi += w', Cond='j!=i', Syn_weight=17, tag_name='Syn3')
 
         # Monitors
-        if Monitors:
+        if Net_setup['Monitors']:
             Mdl['Exc_Sp'] = SpikeMonitor(Mdl['Exc'], name='Exc_Sp')
             Mdl['Inh_Sp'] = SpikeMonitor(Mdl['Inh'], name='Inh_Sp')
             Mdl['Input_Sp'] = SpikeMonitor(Mdl['Input'], name='Input_Sp')
