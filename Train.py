@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # =========================== Parameters ==============================
     init_params = {
         'Random_Seed':0,
-        'Filename':'pairSTDP_NN_Full',
+        'Filename':'pairSTDP_NN_Full_Ed',
         'Gabor_filter':True,
         'Norm':True,
         'Train_dt':60000,
@@ -82,5 +82,5 @@ if __name__ == "__main__":
     
 
     # ==================== Plots of Network Behavior ======================
-    if Net_init['Neurons'] == 100: Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
-    plt.show()
+    # if Net_init['Neurons'] == 100: Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
+    # plt.show()
