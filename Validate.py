@@ -1,6 +1,8 @@
 from keras.datasets import mnist
 from tqdm import tqdm
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from Network.Net import WTA, SpikeMonitor, seed
+from Network.Tools import plot_NonSp
 from brian2.units import *
 
 import matplotlib.pyplot as plt
@@ -87,13 +89,13 @@ if __name__ == "__main__":
     
     Validate_params = {
         'Random_Seed':0,
-        'Filename':'pairSTDP_NN_Full',
+        'Filename':'pairSTDP_NN_Full_Ed',
         'Gabor_filter':True,
         'Norm':True,
         'Train_dt':60000,
         'Test_dt':10000,
-        'Run_train':True,
-        'Run_test':True
+        'Run_train':False,
+        'Run_test':False
     }
 
     Net_init = {
@@ -143,3 +145,11 @@ if __name__ == "__main__":
     print('Accuracy: ' + str(accuracy_r) + ' %')
     print('No Spikes Train Pres: ' + str((len(NonSp_train)/train_dt)*100) + ' %')
     print('No Spikes Test Eval: ' + str((len(NonSp_test)/test_dt)*100) + ' %')
+
+    # ==================== Plots of Network Behavior ======================
+    plot_NonSp(Label_data=y_test[NonSp_test], dataset_type='Test')
+
+    Con_mtx = confusion_matrix(y_pred=result[TrueSp_test], y_true=y_test[TrueSp_test]) # Display Confusion Matrix
+    mtx_dis = ConfusionMatrixDisplay(confusion_matrix=Con_mtx)
+    mtx_dis.plot()
+    plt.show()

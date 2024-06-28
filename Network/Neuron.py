@@ -17,7 +17,7 @@ class Conductance_LIF:
                 'Mem_tau'   : 100*ms,
                 'tau_ge'    : 1.0*ms,
                 'tau_gi'    : 2.0*ms,
-                'tau_theta' : 1e7*ms,
+                'tau_theta' : 0.6e7*ms,
                 'Offset'    : 20.*mV,
                 'Ad_plus'   : 0.05*mV
             }

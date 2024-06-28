@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 
@@ -37,3 +38,18 @@ def GaborKernel(Gb_phi='Odd', theta=[0, 45, 90, 135]):
 def filterGb(Img, kernel):
     return [cv2.filter2D(src=Img, ddepth=0, kernel=k) for k in kernel]
 
+def plot_NonSp(Label_data, dataset_type='Test'):
+    x_arr = np.arange(0, 10, 1)
+    miss_occur = np.bincount(Label_data)
+    if len(miss_occur) < 10:
+        while True:
+            miss_occur = np.append(miss_occur, 0)
+            if len(miss_occur) >= 10: break
+    print(miss_occur)
+    plt.figure(figsize=(8, 6))
+    plt.title('Non Spike Count for '+ dataset_type + ' Dataset')
+    plt.bar(x_arr, miss_occur, ec='yellow', color='k')
+    plt.xticks(ticks=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    plt.ylabel('Frequency')
+    plt.xlabel('Digit')
+    plt.tight_layout()
