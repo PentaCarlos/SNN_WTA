@@ -22,8 +22,8 @@ def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:
         Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_data, preInp=init_params['Gabor_filter'])
         Train_Sp, Input_Sp = [], []
-        Mdl.net.restore(init_params['Filename'], filename='Trained_Models/' + init_params['Filename'] + '.b2')
         for idx in tqdm(range(len(X_pre)), desc='Validating'):
+            Mdl.net.restore(init_params['Filename'], filename='Trained_Models/' + init_params['Filename'] + '.b2')
             # Rate Monitor for Counting Spikes
             mon = SpikeMonitor(Mdl.net['Exc'], name='CountSp')
             Mdl.net.add(mon)
