@@ -1,3 +1,4 @@
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from keras.datasets import mnist
 from tqdm import tqdm
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
@@ -85,17 +86,29 @@ def Calculate_Correct(data, Y, Class_Map):
 
 if __name__ == "__main__":
     
+    # ==================== Argument Initialization ========================
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-s", "--seed", default=0, type=int, help="Random Seed Initialization")
+    parser.add_argument("-f", "--filename", default="default", type=str, help="Filename of the Model to be saved")
+    parser.add_argument("-gb", "--gabor", default=True, type=bool, help="Preprocess Input data with Gabor Filter")
+    parser.add_argument("-n", "--norm", default=True, type=bool, help="Applied Input Normalization after Gabor Filter")
+    parser.add_argument("-m", "--train_dt", default=1000, type=int, help="Length of dataset to train our model")
+    parser.add_argument("-d", "--test_dt", default=10000, type=int, help="Length of dataset to test our model")
+    parser.add_argument("-e", "--run_train", default=True, type=bool, help="Run a single presentation of the train dataset")
+    parser.add_argument("-r", "--run_test", default=True, type=bool, help="Run a single presentation of the test dataset")
+    args = vars(parser.parse_args())
+
     # =========================== Parameters ==============================
     
     Validate_params = {
-        'Random_Seed':0,
-        'Filename':'pairSTDP_NN_Full_Ed',
-        'Gabor_filter':True,
-        'Norm':True,
-        'Train_dt':60000,
-        'Test_dt':10000,
-        'Run_train':False,
-        'Run_test':False
+        'Random_Seed':args['seed'],
+        'Filename':args['filename'],
+        'Gabor_filter':args['gabor'],
+        'Norm':args['norm'],
+        'Train_dt':args['train_dt'],
+        'Test_dt':args['test_dt'],
+        'Run_train':args['run_train'],
+        'Run_test':args['run_test']
     }
 
     Net_init = {
