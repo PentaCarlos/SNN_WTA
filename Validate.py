@@ -8,6 +8,7 @@ from brian2.units import *
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 import sys
 
 def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:str='Train', Run_trial:bool=False):
@@ -94,12 +95,15 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--norm", default=True, type=bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-m", "--train_dt", default=1000, type=int, help="Length of dataset to train our model")
     parser.add_argument("-d", "--test_dt", default=10000, type=int, help="Length of dataset to test our model")
-    parser.add_argument("-e", "--run_train", default=True, type=bool, help="Run a single presentation of the train dataset")
+    parser.add_argument("-rm", "--run_train", default=True, type=bool, help="Run a single presentation of the train dataset")
     parser.add_argument("-r", "--run_test", default=True, type=bool, help="Run a single presentation of the test dataset")
     args = vars(parser.parse_args())
 
     # =========================== Parameters ==============================
-    
+    with open('Network/params.yml', 'r') as file:
+        net = yaml.safe_load(file)
+    file.close()
+
     Validate_params = {
         'Random_Seed':args['seed'],
         'Filename':args['filename'],
@@ -112,11 +116,11 @@ if __name__ == "__main__":
     }
 
     Net_init = {
-        'Neurons':100,
-        'Learning_Rule':'pair_STDP',
-        'Nearest_Neighbor':True,
-        'Run_test':True,
-        'Monitors':False
+        'Neurons':net['Net'][0],
+        'Learning_Rule':net['Net'][1],
+        'Nearest_Neighbor':net['Net'][2],
+        'Run_test':net['Validate'][0],
+        'Monitors':net['Validate'][1]
     }
 
     # ====================== Load MNIST Dataset ==========================

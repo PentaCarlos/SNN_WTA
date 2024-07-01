@@ -7,6 +7,7 @@ from brian2.units import *
 import matplotlib.pyplot as plt
 import numpy as np
 from glob import glob
+import yaml
 import os
 
 def Gabor_Weight_plot(Syn1_weight):
@@ -48,6 +49,10 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     # =========================== Parameters ==============================
+    with open('Network/params.yml', 'r') as file:
+        net = yaml.safe_load(file)
+    file.close()
+    
     init_params = {
         'Random_Seed':args['seed'],
         'Filename':args['filename'],
@@ -59,11 +64,11 @@ if __name__ == "__main__":
     }
 
     Net_init = {
-        'Neurons':100,
-        'Learning_Rule':'pair_STDP',
-        'Nearest_Neighbor':True,
-        'Run_test':False,
-        'Monitors':False
+        'Neurons':net['Net'][0],
+        'Learning_Rule':net['Net'][1],
+        'Nearest_Neighbor':net['Net'][2],
+        'Run_test':net['Train'][0],
+        'Monitors':net['Train'][1]
     }
 
     # ====================== Load MNIST Dataset ==========================
