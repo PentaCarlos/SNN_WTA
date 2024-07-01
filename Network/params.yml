@@ -1,0 +1,16 @@
+Net:
+ - 100          # Number of Neurons per Layer
+ - "pair_STDP"  # Learning Rule
+ - True         # Activate Nearest-neighbor
+
+Behavior:
+  - False       # Deactivate Learning Rule for testing model
+  - True        # Include monitors for observing the behavior of the network
+
+Train:
+  - False       # Deactivate Learning Rule for testing model
+  - False       # Include monitors for observing the behavior of the network
+
+Validate:
+  - True        # Deactivate Learning Rule for testing model
+  - False       # Include monitors for observing the behavior of the network

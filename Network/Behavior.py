@@ -5,6 +5,7 @@ from brian2.units import *
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 def Traces_S1(S1M):
     fig, axs = plt.subplots(3, sharex=True)
@@ -97,16 +98,20 @@ def Learn_Analysis(Net, idx:int=0):
 if __name__ == "__main__":
     
     # ===================== Params Initialization =========================
+    with open('Network/params.yml', 'r') as file:
+        net = yaml.safe_load(file)
+    file.close()
+
     init_params = {
         'Random_Seed':0,
         'Run_Behavior':True
     }
     Net_init = {
-        'Neurons':100,
-        'Learning_Rule':'pair_STDP',
-        'Nearest_Neighbor':True,
-        'Run_test':False,
-        'Monitors':True
+        'Neurons':net['Net'][0],
+        'Learning_Rule':net['Net'][1],
+        'Nearest_Neighbor':net['Net'][2],
+        'Run_test':net['Behavior'][0],
+        'Monitors':net['Behavior'][1]
     }
     # ====================== Load MNIST Dataset ==========================
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
