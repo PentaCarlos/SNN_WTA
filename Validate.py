@@ -15,10 +15,15 @@ def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:
 
     seed(init_params['Random_Seed'])
 
-    if presen_stg == 'Train': dir_data = 'Activity/Train/'
-    elif presen_stg == 'Test': dir_data = 'Activity/Test/'
+    if presen_stg == 'Train': 
+        dir_data = 'Activity/Train/'
+        state_title = 'MAPPING'
+    elif presen_stg == 'Test': 
+        dir_data = 'Activity/Test/'
+        state_title = 'VALIDATING'
 
     if Run_trial:
+        print("================== # "+ state_title +" MODEL # ==================")
         Mdl = WTA(Net_setup=Net_params)
         Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_data, preInp=init_params['Gabor_filter'])
