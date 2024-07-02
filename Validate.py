@@ -171,7 +171,8 @@ if __name__ == "__main__":
     accuracy_r = (correct/test_dt) * 100
     miss_arg = [idx for idx, Img_label in enumerate(result) if Img_label != y_test[idx]]
     True_miss_arg = np.setdiff1d(miss_arg, NonSp_test)
-    
+    np.save('Results/Accuracy/' + Validate_params['Filename'], [accuracy_r, train_dt, (len(NonSp_train)/train_dt)*100, (len(NonSp_test)/test_dt)*100])
+
     print('=============== ' + Validate_params['Filename'] + ' ===============')
     print('-----Excitatory Neuronal Layer Map-----')
     print(Inp_map)

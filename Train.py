@@ -101,7 +101,7 @@ if __name__ == "__main__":
                 Mdl.RunModel(phase='Resting')
 
                 if it_counter % 1000 == 0:
-                    temp_ep = 'Temp_It' + str(ep + 1)
+                    temp_ep = 'Temp_It_' + str(it_counter)
                     Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
         Mdl.net.store(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
         np.save('Temp/Homeo/V_thr', Mdl.get_HomeoThr())
