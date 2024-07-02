@@ -27,6 +27,7 @@ def Gabor_Weight_plot(Syn1_weight):
         plt.imshow(dummy_mtx, cmap='hot_r')
         plt.colorbar()
         plt.tight_layout()
+        plt.savefig('Results/Weight/Gb_Angle' + str(orientation) + '.png')
         init_val = pxl_val
         pxl_val += 196
 
@@ -36,17 +37,22 @@ def Clean_TempFolder(Flush:bool=False):
         for temp_file in file_list:
             os.remove(temp_file)
 
+def Str2bool(Val_arg):
+    if Val_arg == "True": return True
+    elif Val_arg == "False": return False
+
 if __name__ == "__main__":
     
     # ==================== Argument Initialization ========================
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-s", "--seed", default=0, type=int, help="Random Seed Initialization")
     parser.add_argument("-f", "--filename", default="default", type=str, help="Filename of the Model to be saved")
-    parser.add_argument("-gb", "--gabor", default=True, type=bool, help="Preprocess Input data with Gabor Filter")
-    parser.add_argument("-n", "--norm", default=True, type=bool, help="Applied Input Normalization after Gabor Filter")
+    parser.add_argument("-gb", "--gabor", default=True, type=Str2bool, help="Preprocess Input data with Gabor Filter")
+    parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-d", "--dataset", default=1000, type=int, help="Length of dataset to train our model")
     parser.add_argument("-e", "--epoch", default=5, type=int, help="Number of epoch to train our model")
-    parser.add_argument("-r", "--run", default=True, type=bool, help="Run training")
+    parser.add_argument("-p", "--plot", default=True, type=Str2bool, help="Show the weight plots after running the training")
+    parser.add_argument("-r", "--run", default=True, type=Str2bool, help="Run training")
     args = vars(parser.parse_args())
 
     # =========================== Parameters ==============================
@@ -81,11 +87,11 @@ if __name__ == "__main__":
     seed(init_params['Random_Seed'])
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_train']:
+        print("================== # TRAINING MODEL # ==================")
         Clean_TempFolder(Flush=True)
         Mdl.Init_State()
         X_pre = Mdl.preProcess(X_data=X_train[:init_params['Train_dt']], preInp=init_params['Gabor_filter'])
 
-        print("================== # TRAINING MODEL # ==================")
         for ep in range(init_params['Epoch']):
             for idx in tqdm(range(len(X_pre)), desc='Loading ' + str(ep + 1)):
                 Mdl.Norm_SynW(Norm_w=True)
@@ -100,6 +106,6 @@ if __name__ == "__main__":
     
 
     # ==================== Plots of Network Behavior ======================
-    cycle_plots = False
+    cycle_plots = args['plot']
     if ((Net_init['Neurons']) == 100 and (args['gabor'] == True)): Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
     plt.show(block=cycle_plots)
