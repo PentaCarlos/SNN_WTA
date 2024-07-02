@@ -1,9 +1,8 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from keras.datasets import mnist
 from tqdm import tqdm
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from Network.Net import WTA, SpikeMonitor, seed
-from Network.Tools import plot_NonSp
+from Network.Tools import plot_NonSp, plot_AvrInp, plot_MissClass, plot_ConfMtx
 from brian2.units import *
 
 import matplotlib.pyplot as plt
@@ -104,6 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-m", "--train_dt", default=1000, type=int, help="Length of dataset to train our model")
     parser.add_argument("-d", "--test_dt", default=10000, type=int, help="Length of dataset to test our model")
+    parser.add_argument("-p", "--plot", default=False, type=Str2bool, help="Show the result plots after running the Validation process")
     parser.add_argument("-rm", "--run_train", default=True, type=Str2bool, help="Run a single presentation of the train dataset")
     parser.add_argument("-r", "--run_test", default=True, type=Str2bool, help="Run a single presentation of the test dataset")
     args = vars(parser.parse_args())
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     # =================== Count Img with No Spike ===========================
     Sp_train = np.sum(train_data, axis=1)
     Sp_test = np.sum(test_data, axis=1)
+    Test_sum = np.array(np.sum(Inp_test, axis=1))
     NonSp_train = [idx for idx, Zero in enumerate(Sp_train) if Zero == 0]
     NonSp_test = [idx for idx, Zero in enumerate(Sp_test) if Zero == 0]
     TrueSp_test = [idx for idx, Zero in enumerate(Sp_test) if Zero != 0]
@@ -163,6 +164,9 @@ if __name__ == "__main__":
     # ======================= Print Accuracy Report =========================
     correct, result, Class_idx = Calculate_Correct(data=test_data, Y=y_test, Class_Map=Inp_map)
     accuracy_r = (correct/test_dt) * 100
+    miss_arg = [idx for idx, Img_label in enumerate(result) if Img_label != y_test[idx]]
+    True_miss_arg = np.setdiff1d(miss_arg, NonSp_test)
+    
     print('=============== ' + Validate_params['Filename'] + ' ===============')
     print('-----Excitatory Neuronal Layer Map-----')
     print(Inp_map)
@@ -173,9 +177,10 @@ if __name__ == "__main__":
     print('No Spikes Test Eval: ' + str((len(NonSp_test)/test_dt)*100) + ' %')
 
     # ==================== Plots of Network Behavior ======================
+    cycle_plots = args['plot']
     plot_NonSp(Label_data=y_test[NonSp_test], dataset_type='Test')
-
-    Con_mtx = confusion_matrix(y_pred=result[TrueSp_test], y_true=y_test[TrueSp_test]) # Display Confusion Matrix
-    mtx_dis = ConfusionMatrixDisplay(confusion_matrix=Con_mtx)
-    mtx_dis.plot()
-    plt.show()
+    plot_AvrInp(Sp_Inp=Test_sum, Y_data=y_test, NonSp_idx=NonSp_test, Miss_idx=miss_arg, Correct_idx=Class_idx)
+    plot_MissClass(y_arr=np.bincount(result[True_miss_arg]))
+    plot_ConfMtx(Sp_pred=result, Label_true=y_test, TrueSp_idx=TrueSp_test)
+    
+    plt.show(block=cycle_plots)
