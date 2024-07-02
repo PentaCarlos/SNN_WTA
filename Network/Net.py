@@ -19,6 +19,9 @@ class WTA:
         Neuron_Exc = Conductance_LIF(Neuron_type='Excitatory')
         Neuron_Inh = Conductance_LIF(Neuron_type='Inhibitory')
         SynConn = WTA_Connection(Rule=Net_setup['Learning_Rule'], Nearest_Neighbor=Net_setup['Nearest_Neighbor'])
+        self.Exc_params = Neuron_Exc.Params
+        self.Inh_params = Neuron_Inh.Params
+        self.Stdp_params = SynConn.Params
         
         # Input images as rate encoded Poisson generators
         Mdl['Input'] = PoissonGroup(self.n_input, rates=np.zeros(self.n_input)*Hz, name='Input')
@@ -89,6 +92,11 @@ class WTA:
         self.init_Mem = Mem_Potential
         self.init_Syn_Cond = Syn_Conductance
         self.init_Stdp_traces = Stdp_traces
+    
+    def get_HomeoThr(self):
+        v_theta = self.net.get_states(units=False)['Exc']['theta']
+        v_thr = np.array([(self.Exc_params['Vthresh']/volt)-0.02]*self.n_layer)
+        return np.array([v_theta[idx] + vthr_offset for idx, vthr_offset in enumerate(v_thr)])
 
     def RunModel(self, X_single:ndarray=np.zeros(28*28), preInp:bool=False, norm:bool=False, phase:str='Resting'):
         if phase == 'Stimulus':

@@ -14,7 +14,7 @@ def Gabor_Weight_plot(Syn1_weight):
     Weight_m = np.array(Syn1_weight).reshape((784, 100))
     init_val = 0
     pxl_val = 196
-    for orientation in range(4):
+    for orientation in [0, 45, 90, 135]:
         dummy_mtx = np.zeros((140, 140))
         neuron = 0
         for i in range(10):
@@ -23,6 +23,7 @@ def Gabor_Weight_plot(Syn1_weight):
                 dummy_mtx[(i*14):(14*(i+1)), (j*14):((14*(j+1)))] = actual_w
                 neuron += 1
         plt.figure(figsize=(8,6))
+        plt.title('Gabor prefered orientation of ' + str(orientation) + ' Degrees')
         plt.imshow(dummy_mtx, cmap='hot_r')
         plt.colorbar()
         plt.tight_layout()
@@ -99,5 +100,6 @@ if __name__ == "__main__":
     
 
     # ==================== Plots of Network Behavior ======================
-    # if Net_init['Neurons'] == 100: Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
-    # plt.show()
+    cycle_plots = False
+    if ((Net_init['Neurons']) == 100 and (args['gabor'] == True)): Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
+    plt.show(block=cycle_plots)
