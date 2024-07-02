@@ -94,13 +94,17 @@ if __name__ == "__main__":
 
         for ep in range(init_params['Epoch']):
             for idx in tqdm(range(len(X_pre)), desc='Loading ' + str(ep + 1)):
+                it_counter = idx + 1
                 Mdl.Norm_SynW(Norm_w=True)
 
                 Mdl.RunModel(X_single=X_pre[idx], preInp=init_params['Gabor_filter'], norm=init_params['Norm'], phase='Stimulus')
                 Mdl.RunModel(phase='Resting')
-            temp_ep = 'Temp_Ep' + str(ep + 1)
-            Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
+
+                if it_counter % 1000 == 0:
+                    temp_ep = 'Temp_It' + str(ep + 1)
+                    Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
         Mdl.net.store(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
+        np.save('Temp/Homeo/V_thr', Mdl.get_HomeoThr())
     else:
         Mdl.net.restore(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
     
