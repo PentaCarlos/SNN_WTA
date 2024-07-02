@@ -1,3 +1,5 @@
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
@@ -38,6 +40,41 @@ def GaborKernel(Gb_phi='Odd', theta=[0, 45, 90, 135]):
 def filterGb(Img, kernel):
     return [cv2.filter2D(src=Img, ddepth=0, kernel=k) for k in kernel]
 
+def Count_Occurence(X_list, Cond_arr, Cond_key):
+    return [x for idx, x in enumerate(X_list) if Cond_arr[idx] == Cond_key]
+
+def get_Avr_per_Digit(Inp_data, Label_data):
+    Avr_count = []
+    for digit in range(10):
+        Occur_arr = Count_Occurence(X_list=Inp_data, Cond_arr=Label_data, Cond_key=digit)
+        if len(Occur_arr) < 1: Avr_count.append(0)
+        else: Avr_count.append(np.average(Occur_arr))
+    return Avr_count
+
+def plot_AvrInp(Sp_Inp, Y_data, NonSp_idx, Miss_idx, Correct_idx, dataset_type='Test'):
+
+    Inp_NonSp = get_Avr_per_Digit(Inp_data=Sp_Inp[NonSp_idx], Label_data=Y_data[NonSp_idx])
+    Inp_Total = get_Avr_per_Digit(Inp_data=Sp_Inp, Label_data=Y_data)
+    Inp_Missed = get_Avr_per_Digit(Inp_data=Sp_Inp[Miss_idx], Label_data=Y_data[Miss_idx])
+    Inp_Correct = get_Avr_per_Digit(Inp_data=Sp_Inp[Correct_idx], Label_data=Y_data[Correct_idx])
+
+    Inp_data = [Inp_NonSp, Inp_Total, Inp_Missed, Inp_Correct]
+    Correct_Avr = np.average(Inp_Correct)
+
+    x_arr = np.arange(0, 10, 1)
+    plt.figure(figsize=(8, 6))
+    plt.title('Average Spikes produced per Digit (' + dataset_type + ')')
+    for idx in range(4):
+        plt.plot(x_arr, Inp_data[idx], marker='*', markersize=10, linewidth=0)
+    plt.axhline(y=Correct_Avr, color='k', linestyle='--')
+    plt.xticks(ticks=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    plt.ylabel('Spike Count (Average)')
+    plt.xlabel('Digit')
+    plt.legend(['Non Output Spikes', 'Total', 'Missclasified', 'Correct', 'Correct (Avr)'])
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig('Results/Validate/Avr_InputSp.png')
+
 def plot_NonSp(Label_data, dataset_type='Test'):
     x_arr = np.arange(0, 10, 1)
     miss_occur = np.bincount(Label_data)
@@ -53,3 +90,23 @@ def plot_NonSp(Label_data, dataset_type='Test'):
     plt.ylabel('Frequency')
     plt.xlabel('Digit')
     plt.tight_layout()
+    plt.savefig('Results/Validate/NonSp.png')
+
+def plot_MissClass(y_arr:np.ndarray):
+    # Plot the Maximum Frequency of the Missclassified Images
+    x_arr = np.arange(0, 10, 1)
+    plt.figure(figsize=(8, 6))
+    plt.title('Missclassified Digits')
+    plt.bar(x_arr, y_arr, ec='yellow', color='k')
+    plt.xticks(ticks=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    plt.xlabel('Digit')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+    plt.savefig('Results/Validate/MissClassif.png')
+    print(y_arr)
+
+def plot_ConfMtx(Sp_pred, Label_true, TrueSp_idx):
+    Con_mtx = confusion_matrix(y_pred=Sp_pred[TrueSp_idx], y_true=Label_true[TrueSp_idx], normalize='true')
+    mtx_dis = ConfusionMatrixDisplay(confusion_matrix=Con_mtx) # Display Confusion Matrix
+    mtx_dis.plot(cmap=plt.cm.Blues, include_values=False)
+    plt.savefig('Results/Validate/Conf_Mtx.png')

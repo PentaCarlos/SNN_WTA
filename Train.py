@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-d", "--dataset", default=1000, type=int, help="Length of dataset to train our model")
     parser.add_argument("-e", "--epoch", default=5, type=int, help="Number of epoch to train our model")
-    parser.add_argument("-p", "--plot", default=True, type=Str2bool, help="Show the weight plots after running the training")
+    parser.add_argument("-p", "--plot", default=False, type=Str2bool, help="Show the weight plots after running the training")
     parser.add_argument("-r", "--run", default=True, type=Str2bool, help="Run training")
     args = vars(parser.parse_args())
 
