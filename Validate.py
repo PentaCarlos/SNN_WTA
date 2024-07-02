@@ -21,6 +21,9 @@ def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:
         dir_data = 'Activity/Test/'
         state_title = 'VALIDATING'
 
+    if init_params['Load_Temp'] == True: addr_load = 'Temp/'
+    else: addr_load = 'Trained_Models/'
+
     if Run_trial:
         print("================== # "+ state_title +" MODEL # ==================")
         Mdl = WTA(Net_setup=Net_params)
@@ -28,7 +31,7 @@ def get_Spikes(X_data:np.ndarray, init_params:dict, Net_params:dict, presen_stg:
         X_pre = Mdl.preProcess(X_data=X_data, preInp=init_params['Gabor_filter'])
         Train_Sp, Input_Sp = [], []
         for idx in tqdm(range(len(X_pre)), desc='Validating'):
-            Mdl.net.restore(init_params['Filename'], filename='Trained_Models/' + init_params['Filename'] + '.b2')
+            Mdl.net.restore(init_params['Filename'], filename=addr_load + init_params['Filename'] + '.b2')
             # Rate Monitor for Counting Spikes
             mon = SpikeMonitor(Mdl.net['Exc'], name='CountSp')
             Mdl.net.add(mon)
@@ -99,6 +102,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.add_argument("-s", "--seed", default=0, type=int, help="Random Seed Initialization")
     parser.add_argument("-f", "--filename", default="default", type=str, help="Filename of the Model to be saved")
+    parser.add_argument("-t", "--temp", default=False, type=Str2bool, help="Select to load the brian2 file from the temp directory")
     parser.add_argument("-gb", "--gabor", default=True, type=Str2bool, help="Preprocess Input data with Gabor Filter")
     parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-m", "--train_dt", default=1000, type=int, help="Length of dataset to train our model")
@@ -116,6 +120,7 @@ if __name__ == "__main__":
     Validate_params = {
         'Random_Seed':args['seed'],
         'Filename':args['filename'],
+        'Load_Temp':args['temp'],
         'Gabor_filter':args['gabor'],
         'Norm':args['norm'],
         'Train_dt':args['train_dt'],
