@@ -171,7 +171,7 @@ if __name__ == "__main__":
     accuracy_r = (correct/test_dt) * 100
     miss_arg = [idx for idx, Img_label in enumerate(result) if Img_label != y_test[idx]]
     True_miss_arg = np.setdiff1d(miss_arg, NonSp_test)
-    np.save('Results/Accuracy/' + Validate_params['Filename'], [accuracy_r, train_dt, (len(NonSp_train)/train_dt)*100, (len(NonSp_test)/test_dt)*100])
+    np.save('Results/Accuracy/Res_' + Validate_params['Filename'], [accuracy_r, train_dt, (len(NonSp_train)/train_dt)*100, (len(NonSp_test)/test_dt)*100])
 
     print('=============== ' + Validate_params['Filename'] + ' ===============')
     print('-----Excitatory Neuronal Layer Map-----')
@@ -189,4 +189,16 @@ if __name__ == "__main__":
     plot_MissClass(y_arr=np.bincount(result[True_miss_arg]))
     plot_ConfMtx(Sp_pred=result, Label_true=y_test, TrueSp_idx=TrueSp_test)
     
+    it_lim = 25000
+    acc_it = [np.load('Results/Accuracy/Res_Temp_It_' + str(num) + '.npy')[0] for num in np.arange(1000, it_lim+1000, 1000)]
+    x_arr = np.arange(1, len(acc_it)+1, 1)
+    plt.figure(figsize=(8,6))
+    plt.plot(x_arr*1000, acc_it, color='purple', marker='o')
+    plt.ylabel('Accuracy [%]')
+    plt.xlabel('Iteration')
+    plt.xlim(0, it_lim+1000)
+    plt.ylim(40, 100)
+    plt.legend(['pair-wise STDP'])
+    plt.grid(True)
+    plt.tight_layout()
     plt.show(block=cycle_plots)
