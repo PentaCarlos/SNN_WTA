@@ -100,9 +100,14 @@ if __name__ == "__main__":
                 Mdl.RunModel(X_single=X_pre[idx], preInp=init_params['Gabor_filter'], norm=init_params['Norm'], phase='Stimulus')
                 Mdl.RunModel(phase='Resting')
 
-                if it_counter % 1000 == 0:
-                    temp_ep = 'Temp_It_' + str(it_counter)
-                    Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
+                if it_counter <= 5000:
+                    if it_counter % 1000 == 0:
+                        temp_ep = 'Temp_It_' + str(it_counter)
+                        Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
+                else:
+                    if it_counter % 5000 == 0:
+                        temp_ep = 'Temp_It_' + str(it_counter)
+                        Mdl.net.store(temp_ep, 'Temp/' + temp_ep + '.b2')
         Mdl.net.store(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
         np.save('Temp/Homeo/V_thr', Mdl.get_HomeoThr())
     else:
