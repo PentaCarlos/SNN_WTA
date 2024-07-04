@@ -71,6 +71,7 @@ def plot_AvrInp(Sp_Inp, Y_data, NonSp_idx, Miss_idx, Correct_idx, dataset_type='
     plt.ylabel('Spike Count (Average)')
     plt.xlabel('Digit')
     plt.legend(['Non Output Spikes', 'Total', 'Missclasified', 'Correct', 'Correct (Avr)'])
+    plt.ylim(Correct_Avr-50, Correct_Avr+50)
     plt.grid(True)
     plt.tight_layout()
     plt.savefig('Results/Validate/Avr_InputSp.png')
@@ -110,3 +111,17 @@ def plot_ConfMtx(Sp_pred, Label_true, TrueSp_idx):
     mtx_dis = ConfusionMatrixDisplay(confusion_matrix=Con_mtx) # Display Confusion Matrix
     mtx_dis.plot(cmap=plt.cm.Blues, include_values=False)
     plt.savefig('Results/Validate/Conf_Mtx.png')
+
+def plot_AccIt(it_lim:int=25000):
+    acc_it = [np.load('Results/Accuracy/Res_Temp_It_' + str(num) + '.npy')[0] for num in np.arange(1000, it_lim+1000, 1000)]
+    x_arr = np.arange(1, len(acc_it)+1, 1)
+    plt.figure(figsize=(8,6))
+    plt.plot(x_arr*1000, acc_it, color='purple', marker='o')
+    plt.ylabel('Accuracy [%]')
+    plt.xlabel('Iteration')
+    plt.xlim(0, it_lim+1000)
+    plt.ylim(40, 100)
+    plt.legend(['pair-wise STDP'])
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig('Results/Accuracy/Acc_Iteration_LearningRule.png')
