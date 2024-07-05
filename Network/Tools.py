@@ -71,7 +71,7 @@ def plot_AvrInp(Sp_Inp, Y_data, NonSp_idx, Miss_idx, Correct_idx, dataset_type='
     plt.ylabel('Spike Count (Average)')
     plt.xlabel('Digit')
     plt.legend(['Non Output Spikes', 'Total', 'Missclasified', 'Correct', 'Correct (Avr)'])
-    plt.ylim(Correct_Avr-50, Correct_Avr+50)
+    # plt.ylim(Correct_Avr-50, Correct_Avr+50)
     plt.grid(True)
     plt.tight_layout()
     plt.savefig('Results/Validate/Avr_InputSp.png')

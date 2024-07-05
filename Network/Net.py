@@ -14,6 +14,7 @@ class WTA:
         Mdl = {}
         self.n_input = 28*28
         self.n_layer = Net_setup['Neurons']
+        self.Setup = Net_setup
         
         # Initialize Predifined Class Models
         Neuron_Exc = Conductance_LIF(Neuron_type='Excitatory')
@@ -41,6 +42,8 @@ class WTA:
 
         # Monitors
         if Net_setup['Monitors']:
+            if self.Setup['Learning_Rule'] == 'pair_STDP': Syn_var = ['pre', 'post', 'w']
+            elif self.Setup['Learning_Rule'] == 'Triplet_STDP': Syn_var = ['pre', 'post', 'post2', 'w']
             Mdl['Exc_Sp'] = SpikeMonitor(Mdl['Exc'], name='Exc_Sp')
             Mdl['Inh_Sp'] = SpikeMonitor(Mdl['Inh'], name='Inh_Sp')
             Mdl['Input_Sp'] = SpikeMonitor(Mdl['Input'], name='Input_Sp')
@@ -48,7 +51,7 @@ class WTA:
             Mdl['Inh_rate'] = PopulationRateMonitor(Mdl['Inh'], name='Inh_rate')
             Mdl['Exc_mem'] = StateMonitor(Mdl['Exc'], ['v', 'IsynE', 'IsynI', 'Vthr'], record=True, name='Exc_mem')
             Mdl['Inh_mem'] = StateMonitor(Mdl['Inh'], ['v', 'IsynE', 'IsynI'], record=True, name='Inh_mem')
-            Mdl['Syn1_Mon'] = StateMonitor(Mdl['Syn1'], ['pre', 'post', 'w'], record=Mdl['Syn1'][300:304,15], name='Syn1_Mon')
+            Mdl['Syn1_Mon'] = StateMonitor(Mdl['Syn1'], Syn_var, record=Mdl['Syn1'][300:304,15], name='Syn1_Mon')
 
         # Save Network as Objects for the Class
         self.net = Network(Mdl.values())
@@ -84,13 +87,20 @@ class WTA:
             'Inh_ge':self.net['Inh'].ge,
             'Inh_gi':self.net['Inh'].gi
         }
-        Stdp_traces = {
-            'Pre_trace':self.net['Syn1'].pre,
-            'Post_trace':self.net['Syn1'].post
-        }
-
         self.init_Mem = Mem_Potential
         self.init_Syn_Cond = Syn_Conductance
+
+        if self.Setup['Learning_Rule'] == 'pair_STDP':
+            Stdp_traces = {
+                'Pre_trace':self.net['Syn1'].pre,
+                'Post_trace':self.net['Syn1'].post
+            }
+        else:
+            Stdp_traces = {
+                'Pre_trace':self.net['Syn1'].pre,
+                'Post_trace':self.net['Syn1'].post,
+                'Post_trace2':self.net['Syn1'].post2
+            }
         self.init_Stdp_traces = Stdp_traces
     
     def get_HomeoThr(self):
@@ -130,9 +140,13 @@ class WTA:
             self.net['Exc'].gi = self.init_Syn_Cond['Exc_gi']
             self.net['Inh'].ge = self.init_Syn_Cond['Inh_ge']
             self.net['Inh'].gi = self.init_Syn_Cond['Inh_gi']
-            self.net['Syn1'].pre = self.init_Stdp_traces['Pre_trace']
-            self.net['Syn1'].post = self.init_Stdp_traces['Post_trace']
-        
+            if self.Setup['Learning_Rule'] == 'pair_STDP':
+                self.net['Syn1'].pre = self.init_Stdp_traces['Pre_trace']
+                self.net['Syn1'].post = self.init_Stdp_traces['Post_trace']
+            else:
+                self.net['Syn1'].pre = self.init_Stdp_traces['Pre_trace']
+                self.net['Syn1'].post = self.init_Stdp_traces['Post_trace']
+                self.net['Syn1'].post2 = self.init_Stdp_traces['Post_trace2']
         else:
             print('Phase not correctly declared!!')
             sys.exit(0)
