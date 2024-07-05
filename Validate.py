@@ -189,16 +189,16 @@ if __name__ == "__main__":
     plot_MissClass(y_arr=np.bincount(result[True_miss_arg]))
     plot_ConfMtx(Sp_pred=result, Label_true=y_test, TrueSp_idx=TrueSp_test)
     
-    it_lim = 25000
-    acc_it = [np.load('Results/Accuracy/Res_Temp_It_' + str(num) + '.npy')[0] for num in np.arange(1000, it_lim+1000, 1000)]
-    x_arr = np.arange(1, len(acc_it)+1, 1)
-    plt.figure(figsize=(8,6))
-    plt.plot(x_arr*1000, acc_it, color='purple', marker='o')
-    plt.ylabel('Accuracy [%]')
-    plt.xlabel('Iteration')
-    plt.xlim(0, it_lim+1000)
-    plt.ylim(40, 100)
-    plt.legend(['pair-wise STDP'])
-    plt.grid(True)
-    plt.tight_layout()
+    # it_lim = 25000
+    # acc_it = [np.load('Results/Accuracy/Res_Temp_It_' + str(num) + '.npy')[0] for num in np.arange(1000, it_lim+1000, 1000)]
+    # x_arr = np.arange(1, len(acc_it)+1, 1)
+    # plt.figure(figsize=(8,6))
+    # plt.plot(x_arr*1000, acc_it, color='purple', marker='o')
+    # plt.ylabel('Accuracy [%]')
+    # plt.xlabel('Iteration')
+    # plt.xlim(0, it_lim+1000)
+    # plt.ylim(40, 100)
+    # plt.legend(['pair-wise STDP'])
+    # plt.grid(True)
+    # plt.tight_layout()
     plt.show(block=cycle_plots)

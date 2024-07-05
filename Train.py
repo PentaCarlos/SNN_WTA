@@ -31,6 +31,22 @@ def Gabor_Weight_plot(Syn1_weight):
         init_val = pxl_val
         pxl_val += 196
 
+def plot_Weight(Syn1_weight):
+    Weight_m = np.array(Syn1_weight).reshape((784, 100))
+    dummy_mtx = np.zeros((280, 280))
+    neuron = 0
+    for i in range(10):
+        for j in range(10):
+            actual_w = Weight_m[:,neuron].reshape((28, 28))
+            dummy_mtx[(i*28):(28*(i+1)), (j*28):((28*(j+1)))] = actual_w
+            neuron += 1
+    plt.figure(figsize=(8,6))
+    plt.title('2D Receptive Field')
+    plt.imshow(dummy_mtx, cmap='hot_r')
+    plt.colorbar()
+    plt.tight_layout()
+    plt.savefig('Results/Weight/ReceptiveField.png')
+
 def Clean_TempFolder(Flush:bool=False):
     if Flush:
         file_list = glob('Temp/*.b2')
@@ -51,6 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-d", "--dataset", default=1000, type=int, help="Length of dataset to train our model")
     parser.add_argument("-e", "--epoch", default=5, type=int, help="Number of epoch to train our model")
+    parser.add_argument("-t", "--temp", default=False, type=Str2bool, help="Select to load the brian2 file from the temp directory")
     parser.add_argument("-p", "--plot", default=False, type=Str2bool, help="Show the weight plots after running the training")
     parser.add_argument("-r", "--run", default=True, type=Str2bool, help="Run training")
     args = vars(parser.parse_args())
@@ -63,6 +80,7 @@ if __name__ == "__main__":
     init_params = {
         'Random_Seed':args['seed'],
         'Filename':args['filename'],
+        'Load_Temp':args['temp'],
         'Gabor_filter':args['gabor'],
         'Norm':args['norm'],
         'Train_dt':args['dataset'],
@@ -111,10 +129,13 @@ if __name__ == "__main__":
         Mdl.net.store(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
         np.save('Temp/Homeo/V_thr', Mdl.get_HomeoThr())
     else:
-        Mdl.net.restore(init_params['Filename'],'Trained_Models/' + init_params['Filename'] + '.b2')
+        if init_params['Load_Temp'] == True: Mdl_addr = 'Temp/'
+        else: Mdl_addr = 'Trained_Models/'
+        Mdl.net.restore(init_params['Filename'],Mdl_addr + init_params['Filename'] + '.b2')
     
 
     # ==================== Plots of Network Behavior ======================
     cycle_plots = args['plot']
     if ((Net_init['Neurons']) == 100 and (args['gabor'] == True)): Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
+    if ((Net_init['Neurons']) == 100 and (args['gabor'] == False)): plot_Weight(Syn1_weight=Mdl['Syn1'].w)
     plt.show(block=cycle_plots)
