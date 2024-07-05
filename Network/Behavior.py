@@ -18,6 +18,19 @@ def Traces_S1(S1M):
     axs[2].set_ylabel('Synaptic Weight')
     plt.tight_layout()
 
+def Traces_S1_Triplet(S1M):
+    fig, axs = plt.subplots(4, sharex=True)
+    fig.set_size_inches(8, 6)
+    axs[0].plot(S1M.t/second, S1M.pre.T)
+    axs[0].set_ylabel('Presynaptic Trace')
+    axs[1].plot(S1M.t/second, S1M.post.T)
+    axs[1].set_ylabel('Postsynaptic Trace')
+    axs[2].plot(S1M.t/second, S1M.post2.T)
+    axs[2].set_ylabel('Postsynaptic Trace 2')
+    axs[3].plot(S1M.t/second, S1M.w.T)
+    axs[3].set_ylabel('Synaptic Weight')
+    plt.tight_layout()
+
 def pre_post_Spikes(preSp, postSp):
     fig, axs = plt.subplots(2, 1, sharex=True)
     fig.set_size_inches(8, 6)
@@ -134,7 +147,8 @@ if __name__ == "__main__":
         Mdl.net.restore('Mdl_Behavior','Temp/Mdl_Behavior.b2')
     
     # ==================== Plots of Network Behavior ====================== 
-    Traces_S1(S1M=Mdl.net['Syn1_Mon'])
+    if net['Net'][1] == 'pair_STDP': Traces_S1(S1M=Mdl.net['Syn1_Mon'])
+    elif net['Net'][1] == 'Triplet_STDP': Traces_S1_Triplet(S1M=Mdl.net['Syn1_Mon'])
     NeuronMem(ESM=Mdl.net['Exc_mem'], ISM=Mdl.net['Inh_mem'], neuron=15)
     LayerRate(ERM=Mdl.net['Exc_rate'], IRM=Mdl.net['Inh_rate'])
     LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
