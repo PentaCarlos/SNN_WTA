@@ -63,6 +63,14 @@ class WTA:
     def Norm_SynW(self, Norm_w:bool=False):
         if Norm_w: self.net['Syn1'].w = norm_Weight(Syn=self.net['Syn1'], Exc_neurons=self.n_layer)
 
+    def Norm_Inp(self, Inp:list, Norm_Inp:bool=False):
+        Inp = np.array(Inp).reshape((self.n_input))
+        if Norm_Inp:
+            norm_factor = 2750.
+            Avr = np.sum(Inp)
+            return [(norm_factor*x)/Avr for x in Inp]
+        else: return Inp
+
     def preProcess(self, X_data, preInp=False):
         Gb_kernels = GaborKernel(Gb_phi='Even')
 
@@ -95,7 +103,7 @@ class WTA:
                 'Pre_trace':self.net['Syn1'].pre,
                 'Post_trace':self.net['Syn1'].post
             }
-        else:
+        if self.Setup['Learning_Rule'] == 'Triplet_STDP':
             Stdp_traces = {
                 'Pre_trace':self.net['Syn1'].pre,
                 'Post_trace':self.net['Syn1'].post,
@@ -127,7 +135,8 @@ class WTA:
                 self.net.run(0.35*second)
             else:
                 # Presenting Stimulus
-                self.net['Input'].rates = np.array(X_single).reshape((self.n_input))*Hz
+                Inp_data = self.Norm_Inp(Inp=X_single, Norm_Inp=norm)
+                self.net['Input'].rates = Inp_data*Hz
                 self.net.run(0.35*second)
         
         elif phase == 'Resting':
