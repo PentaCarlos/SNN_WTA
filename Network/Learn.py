@@ -35,18 +35,20 @@ class WTA_Connection:
                 self.Params = {
                     'tau_pre'   : 20*ms,
                     'tau_post'  : 20*ms,
-                    'Apost'     : -0.0105,
-                    'Apre'      : 0.01,
-                    'Gmax'      : 0.05
+                    'Apost'     : -0.105,
+                    'Apre'      : 0.1,
+                    'pre_rate'  : 0.001,
+                    'post_rate' : 0.1,
+                    'Gmax'      : 1.0
                 }
                 self.pre_event = '''
                     ge += w
                     pre += Apre
-                    w = clip(w + On*post, 0, Gmax)
+                    w = clip(w + On*pre_rate*post, 0, Gmax)
                 '''
                 self.post_event = '''
                     post += Apost
-                    w = clip(w + On*pre, 0, Gmax)
+                    w = clip(w + On*post_rate*pre, 0, Gmax)
                 '''
         elif Rule == 'Triplet_STDP':
             self.Stdp = '''
