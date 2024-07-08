@@ -105,14 +105,15 @@ if __name__ == "__main__":
     seed(init_params['Random_Seed'])
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_train']:
-        print("================== # TRAINING MODEL # ==================")
+        it_counter = 0
         Clean_TempFolder(Flush=True)
         Mdl.Init_State()
+        print("================== # TRAINING MODEL # ==================")
         X_pre = Mdl.preProcess(X_data=X_train[:init_params['Train_dt']], preInp=init_params['Gabor_filter'])
 
         for ep in range(init_params['Epoch']):
             for idx in tqdm(range(len(X_pre)), desc='Loading ' + str(ep + 1)):
-                it_counter = idx + 1
+                it_counter += 1
                 Mdl.Norm_SynW(Norm_w=True)
 
                 Mdl.RunModel(X_single=X_pre[idx], preInp=init_params['Gabor_filter'], norm=init_params['Norm'], phase='Stimulus')
