@@ -68,7 +68,7 @@ class WTA:
         if Norm_Inp:
             norm_factor = 2750.
             Avr = np.sum(Inp)
-            return [(norm_factor*x)/Avr for x in Inp]
+            return (norm_factor/Avr)*Inp
         else: return Inp
 
     def preProcess(self, X_data, preInp=False):
