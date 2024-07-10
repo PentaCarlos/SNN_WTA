@@ -123,6 +123,7 @@ class WTA:
                 for idx in range(4):
                     img_arr = np.array(X_single[idx]).reshape((14*14)) # Reshaped Reduced Gabor Filtered Img
                     Gb_norm = self.Norm_Inp(Inp=img_arr, Inp_Shape=14*14, Norm_factor=1000, Norm_Inp=norm)
+                    if not norm: Gb_norm = Gb_norm/4.96
                     Inp_data.extend(Gb_norm)
             else:
                 Inp_data = self.Norm_Inp(Inp=X_single, Inp_Shape=self.n_input, Norm_factor=2750, Norm_Inp=norm)
