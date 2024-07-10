@@ -1,3 +1,4 @@
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from keras.datasets import mnist
 from tqdm import tqdm
 from Network.Net import WTA, seed
@@ -107,17 +108,32 @@ def Learn_Analysis(Net, idx:int=0):
     axs[3].set_ylabel(r'$W(t)$')
     axs[3].grid()
     plt.tight_layout()
-        
+
+def Str2bool(Val_arg):
+    if Val_arg == "True": return True
+    elif Val_arg == "False": return False
+
 if __name__ == "__main__":
     
+    # ==================== Argument Initialization ========================
+    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-s", "--seed", default=0, type=int, help="Random Seed Initialization")
+    parser.add_argument("-gb", "--gabor", default=True, type=Str2bool, help="Preprocess Input data with Gabor Filter")
+    parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
+    parser.add_argument("-p", "--plot", default=True, type=Str2bool, help="Show the weight plots after running the training")
+    parser.add_argument("-r", "--run", default=True, type=Str2bool, help="Run training")
+    args = vars(parser.parse_args())
+
     # ===================== Params Initialization =========================
     with open('Network/params.yml', 'r') as file:
         net = yaml.safe_load(file)
     file.close()
 
     init_params = {
-        'Random_Seed':0,
-        'Run_Behavior':True
+        'Random_Seed':args['seed'],
+        'Gabor_filter':args['gabor'],
+        'Norm':args['norm'],
+        'Run_Behavior':args['run']
     }
     Net_init = {
         'Neurons':net['Net'][0],
@@ -136,11 +152,11 @@ if __name__ == "__main__":
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_Behavior']:
         Mdl.Init_State()
-        X_pre = Mdl.preProcess(X_data=X_train[:30], preInp=True)
+        X_pre = Mdl.preProcess(X_data=X_train[:30], preInp=init_params['Gabor_filter'])
         for idx in tqdm(range(len(X_pre)), desc='Loading'):
             Mdl.Norm_SynW(Norm_w=True)
 
-            Mdl.RunModel(X_single=X_pre[idx], preInp=True, norm=True, phase='Stimulus')
+            Mdl.RunModel(X_single=X_pre[idx], preInp=init_params['Gabor_filter'], norm=init_params['Norm'], phase='Stimulus')
             Mdl.RunModel(phase='Resting')
         Mdl.net.store('Mdl_Behavior','Temp/Mdl_Behavior.b2')
     else:
@@ -154,4 +170,4 @@ if __name__ == "__main__":
     LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
     pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'])
     Learn_Analysis(Net=Mdl.net, idx=0)
-    plt.show()
+    plt.show(block=args['plot'])

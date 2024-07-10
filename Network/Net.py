@@ -63,12 +63,12 @@ class WTA:
     def Norm_SynW(self, Norm_w:bool=False):
         if Norm_w: self.net['Syn1'].w = norm_Weight(Syn=self.net['Syn1'], Exc_neurons=self.n_layer)
 
-    def Norm_Inp(self, Inp:list, Norm_Inp:bool=False):
-        Inp = np.array(Inp).reshape((self.n_input))
+    def Norm_Inp(self, Inp:list, Inp_Shape:int, Norm_factor:int, Norm_Inp:bool=False):
+        Inp = np.array(Inp).reshape((Inp_Shape))
         if Norm_Inp:
-            norm_factor = 2750.
+            #norm_factor = 2750.
             Avr = np.sum(Inp)
-            return (norm_factor/Avr)*Inp
+            return (Norm_factor/Avr)*Inp
         else: return Inp
 
     def preProcess(self, X_data, preInp=False):
@@ -122,22 +122,14 @@ class WTA:
                 Inp_data = []
                 for idx in range(4):
                     img_arr = np.array(X_single[idx]).reshape((14*14)) # Reshaped Reduced Gabor Filtered Img
-                    if norm:
-                        norm_factor = 1000.
-                        Avr_Gb = np.sum(img_arr)
-                        img_norm = [(norm_factor*x)/Avr_Gb for x in img_arr]
-                        Inp_data.extend(img_norm)
-                    else:
-                        Inp_data.extend(img_arr)
-                
-                # Presenting Stimulus
-                self.net['Input'].rates = Inp_data*Hz
-                self.net.run(0.35*second)
+                    Gb_norm = self.Norm_Inp(Inp=img_arr, Inp_Shape=14*14, Norm_factor=1000, Norm_Inp=norm)
+                    Inp_data.extend(Gb_norm)
             else:
-                # Presenting Stimulus
-                Inp_data = self.Norm_Inp(Inp=X_single, Norm_Inp=norm)
-                self.net['Input'].rates = Inp_data*Hz
-                self.net.run(0.35*second)
+                Inp_data = self.Norm_Inp(Inp=X_single, Inp_Shape=self.n_input, Norm_factor=2750, Norm_Inp=norm)
+            
+            # Presenting Stimulus
+            self.net['Input'].rates = Inp_data*Hz
+            self.net.run(0.35*second)
         
         elif phase == 'Resting':
             # Resting Phase
