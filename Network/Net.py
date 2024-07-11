@@ -73,7 +73,6 @@ class WTA:
 
     def preProcess(self, X_data, preInp=False):
         Gb_kernels = GaborKernel(Gb_phi='Even')
-
         if preInp:
             X_pre = []
             for idx in tqdm(range(len(X_data)), desc='Filtering'):
@@ -82,6 +81,7 @@ class WTA:
                 X_pre.append(single_img)
         else:
             X_pre = X_data
+        self.Stab_rate = np.sum(X_pre)/np.sum(X_data)
         return X_pre
     
     def Init_State(self):
@@ -123,7 +123,7 @@ class WTA:
                 for idx in range(4):
                     img_arr = np.array(X_single[idx]).reshape((14*14)) # Reshaped Reduced Gabor Filtered Img
                     Gb_norm = self.Norm_Inp(Inp=img_arr, Inp_Shape=14*14, Norm_factor=1000, Norm_Inp=norm)
-                    if not norm: Gb_norm = Gb_norm/4.96
+                    if not norm: Gb_norm = Gb_norm/self.Stab_rate
                     Inp_data.extend(Gb_norm)
             else:
                 Inp_data = self.Norm_Inp(Inp=X_single, Inp_Shape=self.n_input, Norm_factor=2750, Norm_Inp=norm)
