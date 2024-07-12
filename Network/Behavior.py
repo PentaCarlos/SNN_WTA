@@ -17,6 +17,7 @@ def Traces_S1(S1M):
     axs[1].set_ylabel('Postsynaptic Trace')
     axs[2].plot(S1M.t/second, S1M.w.T)
     axs[2].set_ylabel('Synaptic Weight')
+    axs[2].set_xlabel('Time [s]')
     plt.tight_layout()
 
 def Traces_S1_Triplet(S1M):
@@ -30,6 +31,7 @@ def Traces_S1_Triplet(S1M):
     axs[2].set_ylabel('Postsynaptic Trace 2')
     axs[3].plot(S1M.t/second, S1M.w.T)
     axs[3].set_ylabel('Synaptic Weight')
+    axs[3].set_xlabel('Time [s]')
     plt.tight_layout()
 
 def pre_post_Spikes(preSp, postSp):
@@ -39,6 +41,7 @@ def pre_post_Spikes(preSp, postSp):
     axs[0].set_ylabel('Pixel Index')
     axs[1].plot(postSp.t/second, postSp.i, '.r')
     axs[1].set_ylabel('Neuron Index')
+    axs[1].set_xlabel('Time [s]')
     plt.tight_layout()
 
 
@@ -52,12 +55,12 @@ def NeuronMem(ESM, ISM, neuron=13):
     axs[0].plot(ESM.t[cnt:]/second, ESM.Vthr[neuron][cnt:]/mV, label='Exc Threshold', color='black')
     axs[0].set_ylabel('Voltage [mV]')
     axs[0].legend()
-    axs[1].set_title('Excitatory Layer')
+    axs[1].set_title('Excitatory Layer Postsynaptic Currents')
     axs[1].plot(ESM.t[cnt:]/second, ESM.IsynE[neuron][cnt:]/pA, label='EPSC', color='r')
     axs[1].plot(ESM.t[cnt:]/second, ESM.IsynI[neuron][cnt:]/pA, label='IPSC', color='b')
     axs[1].set_ylabel('Current [pA]')
     axs[1].legend()
-    axs[2].set_title('Inhibitory Layer')
+    axs[2].set_title('Inhibitory Layer Postsynaptic Currents')
     axs[2].plot(ISM.t[cnt:]/second, ISM.IsynE[neuron][cnt:]/pA, label='EPSC', color='r')
     axs[2].plot(ISM.t[cnt:]/second, ISM.IsynI[neuron][cnt:]/pA, label='IPSC', color='b')
     axs[2].set_ylabel('Current [pA]')
@@ -68,9 +71,10 @@ def NeuronMem(ESM, ISM, neuron=13):
 def LayerRate(ERM, IRM):
     plt.figure(figsize=(8, 6))
     # Config used for smooth rate == (window="flat", width=0.1*ms)
-    plt.plot(ERM.t/second, ERM.rate*Hz, color='r')
-    plt.plot(IRM.t/second, IRM.rate*Hz, color='b')
+    plt.plot(ERM.t/second, ERM.smooth_rate(width=0.1*ms)/Hz, color='r')
+    plt.plot(IRM.t/second, IRM.smooth_rate(width=0.1*ms)/Hz, color='b')
     plt.ylabel('Rate [Hz]')
+    plt.xlabel('Time [s]')
     plt.tight_layout()
 
 def LayerSpike(ESP, ISP):
@@ -78,6 +82,25 @@ def LayerSpike(ESP, ISP):
     plt.plot(ESP.t/second, ESP.i, '.r')
     plt.plot(ISP.t/second, ISP.i, '.b')
     plt.ylabel('Neuron Index')
+    plt.xlabel('Time [s]')
+    plt.tight_layout()
+
+def NeuronRate(ESP):
+    counter_dic = {i:list(ESP.i).count(i) for i in ESP.i}
+    plt.figure(figsize=(8,6))
+    for key, value in counter_dic.items():
+        #print(key, '->', value/(0.35*30))
+        plt.stem(key, value/(0.35*30))
+    plt.xlabel('Neuron Index')
+    plt.ylabel('Firing Rate [Sp/s]')
+    plt.tight_layout()
+
+def InputRate(InpRM):
+    plt.figure(figsize=(8, 6))
+    # Config used for smooth rate == (window="flat", width=0.1*ms)
+    plt.plot(InpRM.t/second, InpRM.smooth_rate(width=0.1*ms)/Hz, color='g')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Rate [Hz]')
     plt.tight_layout()
 
 def Learn_Analysis(Net, idx:int=0):
@@ -106,6 +129,7 @@ def Learn_Analysis(Net, idx:int=0):
     axs[2].grid()
     axs[3].plot(time, Net['Syn1_Mon'].w.T[:,0], color='b')
     axs[3].set_ylabel(r'$W(t)$')
+    axs[3].set_xlabel('Time [s]')
     axs[3].grid()
     plt.tight_layout()
 
@@ -170,4 +194,6 @@ if __name__ == "__main__":
     LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
     pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'])
     Learn_Analysis(Net=Mdl.net, idx=0)
+    NeuronRate(ESP=Mdl.net['Exc_Sp'])
+    InputRate(InpRM=Mdl.net['Input_rate'])
     plt.show(block=args['plot'])
