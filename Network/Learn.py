@@ -18,8 +18,8 @@ class WTA_Connection:
                 self.Params = {
                     'tau_pre'   : 20*ms,
                     'tau_post'  : 20*ms,
-                    'pre_rate'  : 0.0001,
-                    'post_rate' : 0.01,
+                    'pre_rate'  : 0.001,
+                    'post_rate' : 0.1,
                     'Gmax'      : 1.0
                 }
                 self.pre_event = '''

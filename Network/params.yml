@@ -1,7 +1,7 @@
 Net:
  - 100          # Number of Neurons per Layer
  - "pair_STDP"  # Learning Rule
- - False         # Activate Nearest-neighbor (only for pair_STDP)
+ - True         # Activate Nearest-neighbor (only for pair_STDP)
 
 Behavior:
   - False       # Deactivate Learning Rule for testing model
