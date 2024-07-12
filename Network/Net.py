@@ -49,6 +49,7 @@ class WTA:
             Mdl['Input_Sp'] = SpikeMonitor(Mdl['Input'], name='Input_Sp')
             Mdl['Exc_rate'] = PopulationRateMonitor(Mdl['Exc'], name='Exc_rate')
             Mdl['Inh_rate'] = PopulationRateMonitor(Mdl['Inh'], name='Inh_rate')
+            Mdl['Input_rate'] = PopulationRateMonitor(Mdl['Input'], name='Input_rate')
             Mdl['Exc_mem'] = StateMonitor(Mdl['Exc'], ['v', 'IsynE', 'IsynI', 'Vthr'], record=True, name='Exc_mem')
             Mdl['Inh_mem'] = StateMonitor(Mdl['Inh'], ['v', 'IsynE', 'IsynI'], record=True, name='Inh_mem')
             Mdl['Syn1_Mon'] = StateMonitor(Mdl['Syn1'], Syn_var, record=Mdl['Syn1'][300:304,15], name='Syn1_Mon')
