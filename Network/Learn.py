@@ -63,7 +63,7 @@ class WTA_Connection:
                 'tau_pre'   : 20*ms,
                 'tau_post'  : 20*ms,
                 'tau_post2' : 40*ms,
-                'pre_rate'  : 0.001,
+                'pre_rate'  : 0.01,
                 'post_rate' : 0.1,
                 'Gmax'      : 1.0
             }
