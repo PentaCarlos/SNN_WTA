@@ -10,7 +10,7 @@ import sys
 
 class WTA:
 
-    def __init__(self, Net_setup:dict={'Neurons':100, 'Learning_Rule':'pair_STDP', 'Nearest_Neighbor':True, 'Run_test':False, 'Monitors':False}):
+    def __init__(self, Net_setup:dict={'Neurons':100, 'Learning_Rule':'pair_STDP', 'Nearest_Neighbor':True, 'Pre_Offset':0.0, 'Run_test':False, 'Monitors':False}):
         Mdl = {}
         self.n_input = 28*28
         self.n_layer = Net_setup['Neurons']
@@ -19,7 +19,7 @@ class WTA:
         # Initialize Predifined Class Models
         Neuron_Exc = Conductance_LIF(Neuron_type='Excitatory')
         Neuron_Inh = Conductance_LIF(Neuron_type='Inhibitory')
-        SynConn = WTA_Connection(Rule=Net_setup['Learning_Rule'], Nearest_Neighbor=Net_setup['Nearest_Neighbor'])
+        SynConn = WTA_Connection(Rule=Net_setup['Learning_Rule'], Nearest_Neighbor=Net_setup['Nearest_Neighbor'], pre_offset=Net_setup['Pre_Offset'])
         self.Exc_params = Neuron_Exc.Params
         self.Inh_params = Neuron_Inh.Params
         self.Stdp_params = SynConn.Params

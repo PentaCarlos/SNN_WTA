@@ -1,8 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
-set Seed=pairSTDP_S
+set Seed=pairSTDPNN_S
 
-FOR /L %%s IN (0,1,4) DO (
-    set "c=!Temp!%%s"
-    python Validate.py -s %%s -f !c! -m 40000
+FOR %%s IN (10 31 41 68) DO (
+    set "c=!Seed!%%s"
+    python Train.py -s %%s -f !c! -d 40000 -e 1
 )

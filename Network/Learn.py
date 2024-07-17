@@ -3,7 +3,7 @@ from brian2.units import *
 
 class WTA_Connection:
 
-    def __init__(self, Rule:str, Nearest_Neighbor:bool):
+    def __init__(self, Rule:str, Nearest_Neighbor:bool, pre_offset:float=0):
         self.Mode = Rule
         self.scheme = Nearest_Neighbor
 
@@ -11,11 +11,12 @@ class WTA_Connection:
             self.Stdp = '''
                 w : 1
                 On : 1 (shared)
-                dpre/dt = -pre/(tau_pre)    : 1 (event-driven)
-                dpost/dt = -post/(tau_post) : 1 (event-driven)
+                dpre/dt = (-pre + LTP_offset)/(tau_pre) : 1 (event-driven)
+                dpost/dt = -post/(tau_post)             : 1 (event-driven)
             '''
             if Nearest_Neighbor:
                 self.Params = {
+                    'LTP_offset': pre_offset,
                     'tau_pre'   : 20*ms,
                     'tau_post'  : 20*ms,
                     'pre_rate'  : 0.0001,
@@ -33,6 +34,7 @@ class WTA_Connection:
                 '''
             else:
                 self.Params = {
+                    'LTP_offset': pre_offset,
                     'tau_pre'   : 20*ms,
                     'tau_post'  : 20*ms,
                     'Apost'     : -0.105,
@@ -54,12 +56,13 @@ class WTA_Connection:
             self.Stdp = '''
                 w : 1
                 On : 1 (shared)
-                post2before                     : 1
-                dpre/dt = -pre/(tau_pre)        : 1 (event-driven)
-                dpost/dt = -post/(tau_post)     : 1 (event-driven)
-                dpost2/dt = -post2/(tau_post2)  : 1 (event-driven)
+                post2before                              : 1
+                dpre/dt = (-pre + LTP_offset)/(tau_pre)  : 1 (event-driven)
+                dpost/dt = -post/(tau_post)              : 1 (event-driven)
+                dpost2/dt = -post2/(tau_post2)           : 1 (event-driven)
             '''
             self.Params = {
+                'LTP_offset': pre_offset,
                 'tau_pre'   : 20*ms,
                 'tau_post'  : 20*ms,
                 'tau_post2' : 40*ms,
