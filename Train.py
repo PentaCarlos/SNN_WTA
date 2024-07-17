@@ -92,6 +92,7 @@ if __name__ == "__main__":
         'Neurons':net['Net'][0],
         'Learning_Rule':net['Net'][1],
         'Nearest_Neighbor':net['Net'][2],
+        'Pre_Offset':net['Net'][3],
         'Run_test':net['Train'][0],
         'Monitors':net['Train'][1]
     }
