@@ -113,6 +113,21 @@ def Learn_Analysis(Net, idx:int=0):
 
     time = Net['Syn1_Mon'].t/second
     t_non_zero = time[w_diff_non_zero]
+    # post_time = []
+    # for post_Sp in Post_spikes:
+    #     for t_arr in t_non_zero: 
+    #         if post_Sp == t_arr: 
+    #             post_time.append(np.round(post_Sp, 4))
+    
+    # pre_time = []
+    # for pre_Sp in Pre_spikes:
+    #     for t_arr in t_non_zero: 
+    #         if pre_Sp == t_arr: 
+    #             pre_time.append(np.round(pre_Sp, 4))
+
+    # print(len(dw))
+    # print(len(pre_diff[np.where(pre_diff != 0)]))
+    # print(len(post_diff[np.where(post_diff != 0)]))
     
 
     fig, axs = plt.subplots(4, 1, sharex=True)
