@@ -111,8 +111,26 @@ def Learn_Analysis(Net, idx:int=0):
     Post_spikes = Net['Exc_Sp'].spike_trains()[15]/second
     Pre_spikes = Net['Input_Sp'].spike_trains()[300+idx]/second
 
+    dt = []
+    new_w = []
     time = Net['Syn1_Mon'].t/second
     t_non_zero = time[w_diff_non_zero]
+    for i in range(0, len(dw)):
+        time_stamp = t_non_zero[i]
+        t_post = (Post_spikes[np.where(Post_spikes <= time_stamp)])
+        t_pre = (Pre_spikes[np.where(Pre_spikes <= time_stamp)])
+        if (len(t_pre) != 0) and (len(t_post) != 0): 
+            dt.append(t_post[-1] - t_pre[-1])
+            new_w.append(dw[i])
+    
+    plt.figure(figsize=(8,6))
+    plt.scatter(dt, new_w, label='Weight Changes', color='b')
+    plt.xlabel(r'$t_{post} - t_{pre}$', fontsize=14)
+    plt.ylabel(r'$\Delta w$', fontsize=14)
+    plt.xlim(-0.2, 0.2)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
     # post_time = []
     # for post_Sp in Post_spikes:
     #     for t_arr in t_non_zero: 
