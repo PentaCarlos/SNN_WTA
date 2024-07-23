@@ -2,7 +2,7 @@ Net:
  - 100          # Number of Neurons per Layer
  - "pair_STDP"  # Learning Rule
  - False         # Activate Nearest-neighbor (only for pair_STDP)
- - -0.005        # LTP Offset 
+ - -0.000        # LTP Offset 
 
 Behavior:
   - False       # Deactivate Learning Rule for testing model
