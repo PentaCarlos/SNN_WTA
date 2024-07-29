@@ -35,7 +35,7 @@ def Traces_S1_Triplet(S1M):
     axs[3].set_xlabel('Time [s]')
     plt.tight_layout()
 
-def pre_post_Spikes(preSp, postSp):
+def pre_post_Spikes(preSp, postSp, Zoom:list=[]):
     fig, axs = plt.subplots(2, 1, sharex=True)
     fig.set_size_inches(8, 6)
     axs[0].plot(preSp.t/second, preSp.i, '.g')
@@ -43,6 +43,11 @@ def pre_post_Spikes(preSp, postSp):
     axs[1].plot(postSp.t/second, postSp.i, '.r')
     axs[1].set_ylabel('Neuron Index')
     axs[1].set_xlabel('Time [s]')
+    if Zoom:
+        axs[0].axvline(x=0.35, color='k')
+        axs[1].axvline(x=0.35, color='k')
+        axs[1].set_xlim(Zoom[0], Zoom[1])
+
     plt.tight_layout()
 
 
@@ -240,7 +245,7 @@ if __name__ == "__main__":
     NeuronMem(ESM=Mdl.net['Exc_mem'], ISM=Mdl.net['Inh_mem'], neuron=15)
     LayerRate(ERM=Mdl.net['Exc_rate'], IRM=Mdl.net['Inh_rate'])
     LayerSpike(ESP=Mdl.net['Exc_Sp'], ISP=Mdl.net['Inh_Sp'])
-    pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'])
+    pre_post_Spikes(preSp=Mdl.net['Input_Sp'], postSp=Mdl.net['Exc_Sp'], Zoom=[])
     Learn_Analysis(Net=Mdl.net, idx=0)
     NeuronRate(ESP=Mdl.net['Exc_Sp'])
     InputRate(InpRM=Mdl.net['Input_rate'])
