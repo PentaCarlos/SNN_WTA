@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from keras.datasets import mnist
 from tqdm import tqdm
+from matplotlib.gridspec import GridSpec
 from Network.Net import WTA, seed
 from brian2.units import *
 
@@ -123,14 +124,14 @@ def Learn_Analysis(Net, idx:int=0):
             dt.append(t_post[-1] - t_pre[-1])
             new_w.append(dw[i])
     
-    plt.figure(figsize=(8,6))
-    plt.scatter(dt, new_w, label='Weight Changes', color='b')
-    plt.xlabel(r'$t_{post} - t_{pre}$', fontsize=14)
-    plt.ylabel(r'$\Delta w$', fontsize=14)
-    plt.xlim(-0.2, 0.2)
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
+    # plt.figure(figsize=(8,6))
+    # plt.scatter(dt, new_w, label='Weight Changes', color='b')
+    # plt.xlabel(r'$t_{post} - t_{pre}$', fontsize=14)
+    # plt.ylabel(r'$\Delta w$', fontsize=14)
+    # plt.xlim(-0.2, 0.2)
+    # plt.grid(True)
+    # plt.legend()
+    # plt.tight_layout()
     # post_time = []
     # for post_Sp in Post_spikes:
     #     for t_arr in t_non_zero: 
@@ -147,24 +148,37 @@ def Learn_Analysis(Net, idx:int=0):
     # print(len(pre_diff[np.where(pre_diff != 0)]))
     # print(len(post_diff[np.where(post_diff != 0)]))
     
+    fig = plt.figure(figsize=(12,6), constrained_layout=True)
+    gs = GridSpec(4, 2, figure=fig)
+    axs_events = fig.add_subplot(gs[0, :-1])
+    axs_events.eventplot(Post_spikes, linelengths=0.5, color='r')
+    axs_events.eventplot(Pre_spikes, linelengths=0.5, lineoffsets=1.5, color='g')
+    axs_events.set_yticks([1, 1.5], ['Post', 'Pre'])
 
-    fig, axs = plt.subplots(4, 1, sharex=True)
-    fig.set_size_inches(8, 12)
-    axs[0].eventplot(Post_spikes, linelengths=0.5, color='r')
-    axs[0].eventplot(Pre_spikes, linelengths=0.5, lineoffsets=1.5, color='g')
-    axs[0].set_yticks([1, 1.5], ['Post', 'Pre'])
-    axs[1].scatter(t_non_zero, dw, label='Weight Changes', color='b')
-    axs[1].set_ylabel(r'$\Delta W$')
-    axs[1].legend()
-    axs[1].grid()
-    axs[2].plot(time, Net['Syn1_Mon'].pre.T[:,0], color='g')
-    axs[2].set_ylabel(r'$Pre_{trace}$')
-    axs[2].grid()
-    axs[3].plot(time, Net['Syn1_Mon'].w.T[:,0], color='b')
-    axs[3].set_ylabel(r'$W(t)$')
-    axs[3].set_xlabel('Time [s]')
-    axs[3].grid()
-    plt.tight_layout()
+    axs_w_changes = fig.add_subplot(gs[1, :-1], sharex=axs_events)
+    axs_w_changes.scatter(t_non_zero, dw, label='Weight Changes', color='b')
+    axs_w_changes.set_ylabel(r'$\Delta W$')
+    axs_w_changes.legend()
+    axs_w_changes.grid()
+
+    axs_preTrace = fig.add_subplot(gs[2, :-1], sharex=axs_events)
+    axs_preTrace.plot(time, Net['Syn1_Mon'].pre.T[:,0], color='g')
+    axs_preTrace.set_ylabel(r'$Pre_{trace}$')
+    axs_preTrace.grid()
+
+    axs_weight_behavior = fig.add_subplot(gs[3, :-1], sharex=axs_events)
+    axs_weight_behavior.plot(time, Net['Syn1_Mon'].w.T[:,0], color='b')
+    axs_weight_behavior.set_ylabel(r'$W(t)$')
+    axs_weight_behavior.set_xlabel('Time [s]')
+    axs_weight_behavior.grid()
+
+    axs_stdp_curve = fig.add_subplot(gs[:, 1])
+    axs_stdp_curve.scatter(dt, new_w, label='Weight Changes', color='b')
+    axs_stdp_curve.set_xlabel(r'$t_{post} - t_{pre}$', fontsize=14)
+    axs_stdp_curve.set_ylabel(r'$\Delta w$', fontsize=14)
+    axs_stdp_curve.set_xlim(-0.2, 0.2)
+    axs_stdp_curve.grid(True)
+    axs_stdp_curve.legend()
 
 def Str2bool(Val_arg):
     if Val_arg == "True": return True
