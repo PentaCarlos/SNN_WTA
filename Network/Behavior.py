@@ -23,7 +23,7 @@ def Traces_S1(S1M):
 
 def Traces_S1_Triplet(S1M):
     fig, axs = plt.subplots(4, sharex=True)
-    fig.set_size_inches(8, 6)
+    fig.set_size_inches(8, 8)
     axs[0].plot(S1M.t/second, S1M.pre.T)
     axs[0].set_ylabel('Presynaptic Trace')
     axs[1].plot(S1M.t/second, S1M.post.T)
