@@ -3,7 +3,7 @@ from tkinter import filedialog
 from keras.datasets import mnist
 from Network.Net import WTA
 from Network.Tools import assign_Class, Calculate_Correct
-from Network.Tools import Gabor_Weight_plot, plot_Weight
+from Network.Tools import Gabor_Weight_plot, plot_Weight, WeightDist
 from Network.Tools import plot_NonSp, plot_AvrInp, plot_MissClass, plot_ConfMtx
 from brian2.units import *
 
@@ -93,6 +93,9 @@ if __name__ == "__main__":
     # ==================== Plots of Network Behavior ======================
     print('Gabor:', str(test_params[0]))
     print('Norm:', str(test_params[1]))
+    
+    WeightDist(Syn=Mdl['Syn1'])
+    
     if ((Net_init['Neurons']) == 100 and (init_params['Gabor_filter'] == True)): Gabor_Weight_plot(Syn1_weight=Mdl['Syn1'].w)
     if ((Net_init['Neurons']) == 100 and (init_params['Gabor_filter'] == False)): plot_Weight(Syn1_weight=Mdl['Syn1'].w)
 
