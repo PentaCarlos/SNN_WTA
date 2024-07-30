@@ -40,6 +40,18 @@ def GaborKernel(Gb_phi='Odd', theta=[0, 45, 90, 135]):
 def filterGb(Img, kernel):
     return [cv2.filter2D(src=Img, ddepth=0, kernel=k) for k in kernel]
 
+def WeightDist(Syn, Gmax:float=1.0):
+    plt.figure(figsize=(8,6))
+    plt.plot(Syn.w/Gmax, '.k')
+    plt.xlabel('Synaptic Connection')
+    plt.ylabel('W / Gmax')
+    plt.tight_layout()
+
+    plt.figure(figsize=(8,6))
+    plt.hist(Syn.w/Gmax, ec='yellow', color='k')
+    plt.xlabel('W / Gmax')
+    plt.tight_layout()
+
 def Gabor_Weight_plot(Syn1_weight):
     Weight_m = np.array(Syn1_weight).reshape((784, 100))
     init_val = 0
