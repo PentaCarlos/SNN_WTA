@@ -40,6 +40,73 @@ def GaborKernel(Gb_phi='Odd', theta=[0, 45, 90, 135]):
 def filterGb(Img, kernel):
     return [cv2.filter2D(src=Img, ddepth=0, kernel=k) for k in kernel]
 
+def Gabor_Weight_plot(Syn1_weight):
+    Weight_m = np.array(Syn1_weight).reshape((784, 100))
+    init_val = 0
+    pxl_val = 196
+    for orientation in [0, 45, 90, 135]:
+        dummy_mtx = np.zeros((140, 140))
+        neuron = 0
+        for i in range(10):
+            for j in range(10):
+                actual_w = Weight_m[init_val:pxl_val,neuron].reshape((14, 14))
+                dummy_mtx[(i*14):(14*(i+1)), (j*14):((14*(j+1)))] = actual_w
+                neuron += 1
+        plt.figure(figsize=(8,6))
+        plt.title('Gabor prefered orientation of ' + str(orientation) + ' Degrees')
+        plt.imshow(dummy_mtx, cmap='hot_r')
+        plt.colorbar()
+        plt.tight_layout()
+        plt.savefig('Results/Weight/Gb_Angle' + str(orientation) + '.png')
+        init_val = pxl_val
+        pxl_val += 196
+
+def plot_Weight(Syn1_weight):
+    Weight_m = np.array(Syn1_weight).reshape((784, 100))
+    dummy_mtx = np.zeros((280, 280))
+    neuron = 0
+    for i in range(10):
+        for j in range(10):
+            actual_w = Weight_m[:,neuron].reshape((28, 28))
+            dummy_mtx[(i*28):(28*(i+1)), (j*28):((28*(j+1)))] = actual_w
+            neuron += 1
+    plt.figure(figsize=(8,6))
+    plt.title('2D Receptive Field')
+    plt.imshow(dummy_mtx, cmap='hot_r')
+    plt.colorbar()
+    plt.tight_layout()
+    plt.savefig('Results/Weight/ReceptiveField.png')
+
+def assign_Class(data, Y):
+    Y = np.array(Y)
+    data_test = np.array(data)
+    assignments = np.ones(len(data_test[0,:])) * -1 # initialize them as not assigned
+    input_nums = np.asarray(Y[:len(data)])
+    maximum_rate = [0] * len(data_test[0,:])    
+    for j in range(10):
+        num_inputs = len(np.where(input_nums == j)[0])
+        if num_inputs > 0:
+            # Sum found index MNIST value (row) to get the average of spikes (col) per MNIST input
+            rate = np.sum(data_test[input_nums == j], axis = 0) / num_inputs
+        for i in range(len(data_test[0,:])):
+            if rate[i] > maximum_rate[i]:
+                maximum_rate[i] = rate[i]
+                assignments[i] = j
+    return assignments
+
+def Calculate_Correct(data, Y, Class_Map):
+    correct, result, correct_class_idx = 0, [], []
+    data = np.array(data)
+    Class_Map = np.array(Class_Map)
+    for idx in range(len(data)):
+        max_val_idx = np.argmax(data[idx,:])
+        assign_val = int(Class_Map[max_val_idx])
+        result.append(assign_val)
+        if assign_val == Y[idx]: 
+            correct += 1
+            correct_class_idx.append(idx)
+    return correct, np.array(result), correct_class_idx
+
 def Count_Occurence(X_list, Cond_arr, Cond_key):
     return [x for idx, x in enumerate(X_list) if Cond_arr[idx] == Cond_key]
 
@@ -83,7 +150,7 @@ def plot_NonSp(Label_data, dataset_type='Test'):
         while True:
             miss_occur = np.append(miss_occur, 0)
             if len(miss_occur) >= 10: break
-    print(miss_occur)
+    print('No generated spikes within excitatory layer per label:', miss_occur)
     plt.figure(figsize=(8, 6))
     plt.title('Non Spike Count for '+ dataset_type + ' Dataset')
     plt.bar(x_arr, miss_occur, ec='yellow', color='k')
@@ -104,7 +171,7 @@ def plot_MissClass(y_arr:np.ndarray):
     plt.ylabel('Frequency')
     plt.tight_layout()
     plt.savefig('Results/Validate/MissClassif.png')
-    print(y_arr)
+    print('Missclassified images per label:', y_arr)
 
 def plot_ConfMtx(Sp_pred, Label_true, TrueSp_idx):
     Con_mtx = confusion_matrix(y_pred=Sp_pred[TrueSp_idx], y_true=Label_true[TrueSp_idx], normalize='true')
