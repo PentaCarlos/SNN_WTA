@@ -8,6 +8,7 @@ from brian2.units import *
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+import os
 
 def Traces_S1(S1M):
     fig, axs = plt.subplots(3, sharex=True)
@@ -185,6 +186,32 @@ def Learn_Analysis(Net, idx:int=0):
     axs_stdp_curve.grid(True)
     axs_stdp_curve.legend()
 
+def Save_data(Net, Arch='Type1'):
+    #cwd = os.getcwd()
+    save_addr = Arch_type(Mdl_type=Arch)
+    np.save(save_addr + 'Global_timestep', Net.net['Exc_mem'].t/second)
+    np.save(save_addr + 'Mem_potential', Net.net['Exc_mem'].v[15][-50000:]/mV)
+    np.save(save_addr + 'Weight_Change', Net.net['Syn1_Mon'].w.T)
+    
+    np.save(save_addr + 'Inp_timing', Net.net['Input_Sp'].t/second)
+    np.save(save_addr + 'Inp_code', Net.net['Input_Sp'].i)
+    np.save(save_addr + 'Exc_timing', Net.net['Exc_Sp'].t/second)
+    np.save(save_addr + 'Exc_code', Net.net['Exc_Sp'].i)
+
+def Mdl_learning(Rule, Sp_int):
+    if Rule == 'pair_STDP':
+        if Sp_int == True:
+            return 'Type2'
+        else:
+            return 'Type1'
+    elif Rule == 'Triplet_STDP':
+        return 'Type3'
+
+def Arch_type(Mdl_type:str='Type1'):
+    if Mdl_type == 'Type1': return 'Behavior/pairSTDP/All_Interaction/'
+    elif Mdl_type == 'Type2': return 'Behavior/pairSTDP/Sym_NN/'
+    elif Mdl_type == 'Type3': return 'Behavior/TripletSTDP/'
+
 def Str2bool(Val_arg):
     if Val_arg == "True": return True
     elif Val_arg == "False": return False
@@ -197,6 +224,7 @@ if __name__ == "__main__":
     parser.add_argument("-gb", "--gabor", default=True, type=Str2bool, help="Preprocess Input data with Gabor Filter")
     parser.add_argument("-n", "--norm", default=True, type=Str2bool, help="Applied Input Normalization after Gabor Filter")
     parser.add_argument("-p", "--plot", default=True, type=Str2bool, help="Show the weight plots after running the training")
+    parser.add_argument("-sv", "--save", default=False, type=Str2bool, help="Save the data behavior within a npy file")
     parser.add_argument("-r", "--run", default=True, type=Str2bool, help="Run training")
     args = vars(parser.parse_args())
 
@@ -209,6 +237,7 @@ if __name__ == "__main__":
         'Random_Seed':args['seed'],
         'Gabor_filter':args['gabor'],
         'Norm':args['norm'],
+        'Save_file':args['save'],
         'Run_Behavior':args['run']
     }
     Net_init = {
@@ -226,6 +255,7 @@ if __name__ == "__main__":
 
     # =========================== Model ===================================
     seed(init_params['Random_Seed'])
+    Global_arch = Mdl_learning(Rule=net['Net'][1], Sp_int=net['Net'][2])
     Mdl = WTA(Net_setup=Net_init)
     if init_params['Run_Behavior']:
         Mdl.Init_State()
@@ -240,6 +270,7 @@ if __name__ == "__main__":
         Mdl.net.restore('Mdl_Behavior','Temp/Mdl_Behavior.b2')
     
     # ==================== Plots of Network Behavior ====================== 
+    if init_params['Save_file']: Save_data(Net=Mdl, Arch=Global_arch)
     if net['Net'][1] == 'pair_STDP': Traces_S1(S1M=Mdl.net['Syn1_Mon'])
     elif net['Net'][1] == 'Triplet_STDP': Traces_S1_Triplet(S1M=Mdl.net['Syn1_Mon'])
     NeuronMem(ESM=Mdl.net['Exc_mem'], ISM=Mdl.net['Inh_mem'], neuron=15)
