@@ -44,6 +44,8 @@ def plot_Inp_code(Inp_time:np.ndarray, Inp:np.ndarray,
     axs_inp.scatter(Inp_time, Inp, color='g', s=6)
     axs_inp.set_ylim(0, 784)
     axs_inp.set_xlim(2, 2.5)
+    axs_inp.set_xlabel('Time [s]')
+    axs_inp.set_ylabel('Pixel Index')
 
     axs_pairSTDP = fig.add_subplot(gs[0, 1])
     axs_pairSTDP.set_title('Excitatory layer response per Learning Rule')
@@ -55,11 +57,13 @@ def plot_Inp_code(Inp_time:np.ndarray, Inp:np.ndarray,
     axs_pairSTDPNN.scatter(pairSTDPNN_time, pairSTDPNN, color='b', label='pairSTDP (NN)', s=6)
     axs_pairSTDPNN.set_ylim(0, 100)
     axs_pairSTDPNN.legend()
+    axs_pairSTDPNN.set_ylabel('Neuron Index')
 
     axs_TripletSTDP = fig.add_subplot(gs[2, 1], sharex=axs_pairSTDP)
     axs_TripletSTDP.scatter(TripletSTDP_time, TripletSTDP, color='m', label='TripletSTDP', s=6)
     axs_TripletSTDP.set_ylim(0, 100)
     axs_TripletSTDP.legend()
+    axs_TripletSTDP.set_xlabel('Time [s]')
     plt.savefig('Behavior/Img_code.png')
 
 plot_mem_potential(gb_time=np.load('Behavior/pairSTDP/All_Interaction/Global_timestep.npy'),
