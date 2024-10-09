@@ -102,6 +102,42 @@ def NeuronRate(ESP):
     plt.ylabel('Firing Rate [Sp/s]')
     plt.tight_layout()
 
+def Neuron_Comp(ExcSp, ExcRate):
+    fig = plt.figure(figsize=(8,6), constrained_layout=True)
+    axs_spike = fig.add_subplot(2, 1, 1)
+    axs_spike.eventplot(ExcSp.spike_trains()[15]/second, color='k')
+    axs_spike.set_ylabel('Neuron Index')
+    axs_spike.set_yticks([1], ['Neuron (15)'])
+
+    gb_store = []
+    x_init, x_end = 0, 1050
+    for x_range in range(100):
+        exc_time = ExcRate.t[x_init:x_end]/second
+
+        local_store = []
+        for x_sp in ExcSp.spike_trains()[15]/second:
+            
+            if x_sp > exc_time[0] and x_sp < exc_time[-1]:
+                local_store.append(x_sp)
+            else:
+                pass
+        
+        if not local_store: gb_store.append([np.average(exc_time)])
+        else: gb_store.append(local_store)
+
+        x_init += 1050
+        x_end += 1050
+
+    sp_rate, sp_avr = [], []
+    for sp_time in gb_store:
+        sp_rate.append(len(sp_time)/100)
+        sp_avr.append(np.average(sp_time))
+    
+    axs_rate = fig.add_subplot(2, 1, 2, sharex=axs_spike)
+    axs_rate.plot(sp_avr, sp_rate)
+    axs_rate.set_ylabel('Firing Rate [Hz]')
+    axs_rate.set_xlabel('Time [s]')
+
 def InputRate(InpRM):
     plt.figure(figsize=(8, 6))
     # Config used for smooth rate == (window="flat", width=0.1*ms)
@@ -280,4 +316,5 @@ if __name__ == "__main__":
     Learn_Analysis(Net=Mdl.net, idx=0)
     NeuronRate(ESP=Mdl.net['Exc_Sp'])
     InputRate(InpRM=Mdl.net['Input_rate'])
+    Neuron_Comp(ExcSp=Mdl.net['Exc_Sp'], ExcRate=Mdl.net['Exc_rate'])
     plt.show(block=args['plot'])
