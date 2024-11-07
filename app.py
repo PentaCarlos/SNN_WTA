@@ -97,13 +97,14 @@ if __name__ == "__main__":
         img_red = cv2.resize(img['composite'], (28, 28))
         Sp_input = get_Spikes(X_inp=img_red[:,:,3], init_params=Validate_params, Net_params=Net_init, Run_trial=Validate_params['Run_Model'])
         max_firing_rate = np.argmax(Sp_input)
-        assign_label = int(Receptive_Field[max_firing_rate])
-        return assign_label
+        assign_label = int(Receptive_Field[max_firing_rate]) if np.sum(Sp_input) != 0 else 'No Spikes'
+        Neuron_Id = int(max_firing_rate) if np.sum(Sp_input) != 0 else 'No Neuron Found'
+        return img_red, assign_label, Neuron_Id
 
     demo = gr.Interface(
         fn=predict,
-        inputs=gr.Sketchpad(),
-        outputs=gr.Label()
+        inputs=gr.Sketchpad(canvas_size=(280,280)),
+        outputs=[gr.Image(label='Resized Img'), gr.Label(label='Decoded Value'), gr.Label(label='Neuron Id')]
     )
 
     demo.launch()
